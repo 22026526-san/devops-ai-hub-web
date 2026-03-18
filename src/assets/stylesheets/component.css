@@ -1,0 +1,12 @@
+/* các style liên quan đến input form button được sử dụng ở các component */
+/* css lại style từ ui của thư viện */
+
+
+/* duong ke ngang */
+.divider {
+  width: 100%;
+  height: 1px;               
+  background-color: #f0f0f0; 
+  border: none;              
+  margin: 5px 0;           
+}
