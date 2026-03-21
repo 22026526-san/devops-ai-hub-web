@@ -17,6 +17,17 @@
     mask-repeat: no-repeat;
 }
 
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;  
+    height: 36px; 
+    border-radius: 50%; 
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
 .icon-setting{
     mask-position: -48px -120px;
 }
@@ -28,7 +39,7 @@
     mask-position: -280px 0px;
 }
 .icon-back{
-    mask-position: -158px 3px;
+    mask-position: -158px -1px;
 }
 .icon-info{
     mask-position: -260px -40px;
@@ -44,4 +55,22 @@
 }
 .icon-warning  {
     mask-position: -260px -40px;
+}
+.icon-up  {
+    mask-position: -260px -40px;
+}
+.icon-down {
+    mask-position: -260px -40px;
+}
+.icon-email  {
+    mask-position: -80px -40px;
+}
+.icon-password  {
+    mask-position: -20px -20px;
+}
+.icon-user {
+    mask-position: -60px -40px;
+}
+.icon-otp {
+    mask-position: -146px -122px;
 }
