@@ -5,6 +5,7 @@ import HomePage from '@/views/app/HomePage.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
 import ForgotPassword from '@/views/auth/ForgotPassword.vue'
+import HomeViewLayout from '@/layout/HomeViewLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,24 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
+      component: HomePage,
+      meta: { 
+        public: true ,
+        layout: HomeViewLayout
+      },
+    },
+    {
+      path: '/ai-agent',
+      name: 'ai-agent',
+      component: HomePage,
+      meta: { 
+        public: true ,
+        layout: DefaultLayout
+      },
+    },
+    {
+      path: '/explore',
+      name: 'explore',
       component: HomePage,
       meta: { 
         public: true ,
