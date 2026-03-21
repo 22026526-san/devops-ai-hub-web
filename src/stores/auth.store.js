@@ -1,6 +1,6 @@
 // src/stores/auth.store.js
 import { defineStore } from 'pinia'
-import { loginApi } from '@/api/modules/auth.api'
+import { loginApi, requestRegisterOtpApi, verifyRegisterOtpApi, requestForgotPasswordOtpApi,resetPasswordApi } from '@/api/modules/auth.api'
 import { getMyInfoApi } from '@/api/modules/user.api'
 
 export const useAuthStore = defineStore('auth', {
@@ -101,6 +101,96 @@ export const useAuthStore = defineStore('auth', {
             error?.response?.data?.message ||
             'Không lấy được thông tin người dùng',
         }
+      }
+    },
+
+    async requestRegisterOtp(payload) {
+      try {
+        this.authLoading = true
+
+        const response = await requestRegisterOtpApi(payload)
+
+        return {
+          success: true,
+          data: response?.data,
+          message: 'Gửi OTP đăng ký thành công',
+        }
+      } catch (error) {
+        return {
+          success: false,
+          error,
+          message:
+            'Gửi OTP đăng ký thất bại',
+        }
+      } finally {
+        this.authLoading = false
+      }
+    },
+
+    async verifyRegisterOtp(payload) {
+      try {
+        this.authLoading = true
+
+        const response = await verifyRegisterOtpApi(payload)
+        const data = response?.data
+
+        return {
+          success: true,
+          data,
+          message: 'Xác thực OTP đăng ký thành công',
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message:
+            'Xác thực OTP đăng ký thất bại',
+        }
+      } finally {
+        this.authLoading = false
+      }
+    },
+
+    async requestForgotPasswordOtp(payload) {
+      try {
+        this.authLoading = true
+
+        const response = await requestForgotPasswordOtpApi(payload)
+
+        return {
+          success: true,
+          data: response?.data,
+          message: 'Mã OTP quên mật khẩu được gửi thành công',
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message:
+            'Mã OTP quên mật khẩu gửi thất bại',
+        }
+      } finally {
+        this.authLoading = false
+      }
+    },
+
+    async resetPassword(payload) {
+      try {
+        this.authLoading = true
+
+        const response = await resetPasswordApi(payload)
+
+        return {
+          success: true,
+          data: response?.data,
+          message: 'Đổi mật khẩu thành công',
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message:
+            'Đổi mật khẩu thất bại',
+        }
+      } finally {
+        this.authLoading = false
       }
     },
 

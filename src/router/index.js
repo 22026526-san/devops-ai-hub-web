@@ -4,6 +4,7 @@ import DefaultLayout from '@/layout/DefaultLayout.vue'
 import HomePage from '@/views/app/HomePage.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
+import ForgotPassword from '@/views/auth/ForgotPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,16 @@ const router = createRouter({
         public: true ,
         layout: null
       },
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+      meta: { 
+        public: true ,
+        layout: null
+      },  
+  
     },
     {
       path: '/home',
