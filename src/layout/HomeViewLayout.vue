@@ -1,0 +1,60 @@
+<template>
+    <div class="layout-container">
+        <div class="head_nav">
+            <Header></Header>
+        </div>
+        <div class="main_content">
+            <div class="left_sidebar">
+                <TopicTags/>
+                <AIAssistantWidget/>
+            </div>
+            <div class="content">
+                <slot></slot>
+            </div>
+            <div class="right_sidebar">
+                <div style="background-color: aqua; height: 100%;width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import Header from '@/layout/components/Header.vue';
+import TopicTags from '@/layout/components/sidebarLeft/TopicTags.vue';
+import AIAssistantWidget from '@/layout/components/sidebarLeft/AIAssistantWidget.vue';
+
+</script>
+
+<style scoped>
+.layout-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.head_nav{
+    height: 68px;
+    width: 100%;
+    margin-bottom: 24px;
+}
+.main_content{
+    width: 100%;
+    height: calc(100% - 68px);
+    display: flex;
+    gap: 26px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+.left_sidebar , .right_sidebar{
+    width: 320px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content{
+    width: calc(100% - 640px);
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+</style>
