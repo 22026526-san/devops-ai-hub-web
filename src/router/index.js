@@ -43,7 +43,7 @@ const router = createRouter({
   
     },
     {
-      path: '/home',
+      path: '/home/:id?',
       name: 'home',
       component: HomePage,
       meta: { 
