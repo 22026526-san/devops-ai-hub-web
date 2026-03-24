@@ -31,12 +31,18 @@
 .icon-setting{
     mask-position: -48px -120px;
 }
+.icon-help{
+    mask-position: -24px -120px;
+}
 
 .icon-upload-img{
     mask-position: -24px -144px;
 }
 .icon-X{
     mask-position: -280px 0px;
+}
+.icon-chevron {
+    mask-position: -134px -1px;
 }
 .icon-back{
     mask-position: -158px -1px;
@@ -88,4 +94,13 @@
 }
 .icon-topic-tags {
     mask-position: -74px -170px;
+}
+.icon-like {
+    mask-position: -199px -59px;
+}
+.icon-save {
+    mask-position: -220px -60px;
+}
+.icon-logout {
+    mask-position: -40px 0px;
 }

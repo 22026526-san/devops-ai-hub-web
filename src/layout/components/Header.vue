@@ -32,13 +32,12 @@
 
     <div class="header-right">
       <!-- Search Box -->
-      <BaseInput 
-        v-model="searchQuery" 
-        placeholder="Search..." 
-        icon="icon-lock"
-        type='text'
+      <BaseSearch
+        v-model="searchQuery"
+        placeholder="Search..."
+        @search="onSearchSubmit"
+        @clear="onSearchClear"
       />
-
       <button class="btn-notification">
         <div class="icon-24 icon-notification"></div>
         <span class="notification-dot" v-if="hasUnreadNotifications"></span>
@@ -49,28 +48,37 @@
           :src="authStore.user?.avatarUrl ? authStore.user.avatarUrl : defaultAvatar" 
           alt="User Avatar" 
           class="user-avatar"
-          @click="router('/profile')"
+          @click="appStore.setSettingMenu(!appStore.settingMenu)"
         />
       </div>
     </div>
   </header>
+  <SettingsMenu v-if="appStore.settingMenu" />
 </template>
 
 <script setup>
 import BaseInput from '@/components/base/BaseInput.vue';
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.store'  
+import { useAuthStore } from '@/stores/auth.store' 
+import { useAppStore } from '@/stores/app.store' 
 import defaultAvatar from '@/assets/img/user_default.png'
+import SettingsMenu from '@/components/SettingsMenu.vue';
+import BaseSearch from '@/components/base/BaseSearch.vue';
 
 const authStore = useAuthStore()
-const router = useRouter()
+const appStore = useAppStore()
 
-console.log('Header rendered:', authStore.user)
 const searchQuery = ref('')
 
 const hasUnreadNotifications = ref(true)
 
+const onSearchSubmit = (text) => {
+  console.log('Người dùng vừa nhấn Enter tìm kiếm:', searchQuery.value)
+}
+
+const onSearchClear = () => {
+  console.log('Đã xóa trắng tìm kiếm')
+}
 </script>
 
 <style scoped>
@@ -136,10 +144,10 @@ const hasUnreadNotifications = ref(true)
 }
 
 .nav-item:hover {
-  color: #0f172a;
+  color: #343434e8; 
 }
 .nav-item:hover .icon-20 {
-  background-color: #0f172a;
+  background-color: #343434e8;
 }
 .nav-item.active .icon-20 {
   background-color: #3b82f6;

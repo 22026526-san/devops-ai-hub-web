@@ -11,14 +11,15 @@
       Need help with your YAML? Ask our DevOps specialized agent.
     </p>
     
-    <button class="btn-start-chat">
+    <button class="btn-start-chat" @click="router.push('/ai-agent')">
       Start Chat
     </button>
   </div>
 </template>
 
 <script setup>
-// Khối này giao diện tĩnh nên chưa cần logic JS phức tạp
+import { useRouter } from 'vue-router';
+const router = useRouter();
 </script>
 
 <style scoped>

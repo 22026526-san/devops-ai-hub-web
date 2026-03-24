@@ -22,8 +22,8 @@
 
         <form @submit.prevent="handleRegister" class="form">
 
-          <!-- Họ và tên -->
-          <BaseInput v-model="form.username" label="Họ và tên" placeholder="Nguyen Van A" icon="icon-user" required @blur="touched.username = true" :error="errors.username"/>
+          <!-- Tên đăng nhập -->
+          <BaseInput v-model="form.username" label="Tên đăng nhập" placeholder="Nguyen Van A" icon="icon-user" required @blur="touched.username = true" :error="errors.username"/>
 
           <!-- Email -->
           <BaseInput v-model="form.email" label="Email" placeholder="devops@example.com" icon="icon-email" type="email"

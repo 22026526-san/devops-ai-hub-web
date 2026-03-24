@@ -25,9 +25,9 @@
         
             <BaseInput
               v-model="form.emailOrUsername"
-              label="Email"
+              label="Email/Username"
               type="text"
-              placeholder="name@company.com"
+              placeholder="name@company.com hoặc username"
               icon="icon-email"
             />
 
