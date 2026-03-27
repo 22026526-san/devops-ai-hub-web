@@ -4,15 +4,15 @@
       <svg class="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"></path>
       </svg>
-      <h3 class="title">AI Assistant</h3>
+      <h3 class="title">Trợ lý AI</h3>
     </div>
     
     <p class="description">
-      Need help with your YAML? Ask our DevOps specialized agent.
+      Trợ lý AI của chúng tôi có thể giúp bạn giải đáp thắc mắc, cung cấp thông tin nhanh chóng và hỗ trợ trong việc tìm kiếm tài liệu liên quan đến DevOps. 
     </p>
     
     <button class="btn-start-chat" @click="router.push('/ai-agent')">
-      Start Chat
+      Bắt đầu 
     </button>
   </div>
 </template>

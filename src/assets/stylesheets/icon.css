@@ -41,6 +41,9 @@
 .icon-X{
     mask-position: -280px 0px;
 }
+.icon-plus{
+    mask-position: -218px 0px;
+}
 .icon-chevron {
     mask-position: -134px -1px;
 }
@@ -76,6 +79,22 @@
 }
 .icon-user {
     mask-position: -60px -40px;
+}
+.icon-camera {
+  width: 24px;
+  height: 24px;
+  background-image: url('@/assets/img/camera-svgrepo-com.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+.icon-code {
+  width: 26px;
+  height: 26px;
+  background-image: url('@/assets/img/file-code-com.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: inline-block;
 }
 .icon-otp {
     mask-position: -146px -122px;

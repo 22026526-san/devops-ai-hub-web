@@ -12,7 +12,8 @@
                 <slot></slot>
             </div>
             <div class="right_sidebar">
-                <div style="background-color: aqua; height: 100%;width: 100%;"></div>
+                <ExpertsToFollow/>
+                <MiniFooter/>
             </div>
         </div>
     </div>
@@ -22,6 +23,8 @@
 import Header from '@/layout/components/Header.vue';
 import TopicTags from '@/layout/components/sidebarLeft/TopicTags.vue';
 import AIAssistantWidget from '@/layout/components/sidebarLeft/AIAssistantWidget.vue';
+import ExpertsToFollow from '@/layout/components/sidebarRight/ExpertsToFollow.vue';
+import MiniFooter from '@/layout/components/sidebarRight/MiniFooter.vue';
 
 </script>
 

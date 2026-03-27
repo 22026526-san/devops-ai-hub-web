@@ -12,19 +12,19 @@
         <!-- Home (Active) -->
         <router-link to="/home" class="nav-item" active-class="active">
           <div class="icon-20 icon-home"></div>
-          Home
+          Trang chủ
         </router-link>
 
         <!-- Explore -->
         <router-link to="/explore" class="nav-item" active-class="active">
           <div class="icon-20 icon-explore"></div>
-          Explore
+          Khám phá
         </router-link>
 
         <!-- AI Agent -->
         <router-link to="/ai-agent" class="nav-item" active-class="active">
           <div class="icon-20 icon-ai"></div>
-          AI Agent
+          Trợ lý AI
         </router-link>
 
       </div>
@@ -34,7 +34,7 @@
       <!-- Search Box -->
       <BaseSearch
         v-model="searchQuery"
-        placeholder="Search..."
+        placeholder="Tìm kiếm..."
         @search="onSearchSubmit"
         @clear="onSearchClear"
       />

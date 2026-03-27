@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="card-header">
       <div class="icon-20 icon-topic-tags"></div>
-      <h3 class="title">Topics</h3>
+      <h3 class="title">Chủ đề</h3>
     </div>
 
     <!-- Danh sách Tags -->
