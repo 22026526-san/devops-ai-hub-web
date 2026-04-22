@@ -43,3 +43,23 @@ export const unlikePostApi = (postId) => {
 export const getMyLikesApi = (params) => {
   return axiosInstance.get('/users/me/likes', { params })
 }
+
+export const getPostCommentsApi = async (postId) => {
+  return axiosInstance.get(`/posts/${postId}/comments`)
+}
+
+export const createCommentApi = async (payload)=> {
+  return axiosInstance.post('/comments', payload)
+}
+
+export const replyCommentApi = async (commentId, payload) => {
+  return axiosInstance.post(`/comments/${commentId}/reply`, payload)
+}
+
+export const updateCommentApi = async (id, payload) => {
+  return axiosInstance.put(`/comments/${id}`, payload)
+}
+
+export const deleteCommentApi = async (id) => {
+  return axiosInstance.delete(`/comments/${id}`)
+}

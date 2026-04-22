@@ -5,11 +5,13 @@
       <PipelineCard 
         v-if="item.postType === 'Pipeline'" 
         :post="item" 
+        @openComment="handdleOpenModal"
       />
       
       <QuestionCard 
         v-else-if="item.postType === 'Question'" 
         :post="item" 
+        @openComment="handdleOpenModal"
       />
       
       <div v-else class="fallback-card">
@@ -17,12 +19,30 @@
       </div>
 
     </template>
+    <PostDetailModal 
+      :isOpen="isModalOpen" 
+      :post="selectedPost" 
+      :comments="apiCommentList"
+      @close="isModalOpen = false"
+      @refreshComments="handdleOpenModal(selectedPost)"
+    />
+
+    <ToastMessage 
+      v-model="toastVisible"
+      :text="toastText"
+      :is-success="!isError"
+      :is-error="isError"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import PipelineCard from '@/views/components/PipelineCard.vue';
 import QuestionCard from '@/views/components/QuestionCard.vue';
+import { getPostCommentsApi } from '@/api/modules/app.api';
+import PostDetailModal from '@/views/app/Post/PostDetailModal.vue'
+import ToastMessage from '@/components/ToastMessage.vue';
 
 defineProps({
   items: {
@@ -30,6 +50,27 @@ defineProps({
     default: () => []
   }
 })
+
+const isModalOpen = ref(false)
+const apiCommentList = ref([])
+const toastVisible = ref(false)
+const toastText = ref('') 
+const isError = ref(false)
+const selectedPost = ref(null)
+
+const handdleOpenModal = async (postData) => {
+  selectedPost.value = postData
+  try {
+    const response = await getPostCommentsApi(postData.id)
+    apiCommentList.value = response.data
+  } catch (error) {
+    isError.value = true
+    toastText.value = "Lỗi khi tải bình luận: " + error.message
+    toastVisible.value = true
+  } finally {
+    isModalOpen.value = true
+  }
+}
 </script>
 
 <style scoped>

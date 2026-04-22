@@ -25,7 +25,7 @@
 
     <div class="post_body-text">
       <h3 class="post_title">{{ post.title }}</h3>
-      <p class="post_summary" v-if="post.summary">{{ post.summary }}</p>
+      <p class="post_summary">{{ post.summary }}</p>
       <div class="post_tags">
         <span v-for="tag in post.tags" :key="tag.id">#{{ tag.name }}</span>
       </div>
@@ -61,7 +61,7 @@
               />
               <span>{{ post.likeCount }}</span>
             </div>
-            <div class="action-btn">
+            <div class="action-btn" @click="emit('openComment', post)">
               <MessageSquare :size="20"/>
               <span>{{ post.commentCount }}</span>
             </div>
@@ -82,6 +82,7 @@ import { MessageSquare, ThumbsUp,  Earth, Users,Bookmark,Lock } from 'lucide-vue
 import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
+import { formatDate, formatTime } from '@/utils/format'
 
 const props = defineProps({
   post: {
@@ -89,6 +90,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const emit = defineEmits(['openComment'])
 
 const editableCode = ref(props.post.detail?.pipelineContent || '')
 
@@ -136,11 +139,6 @@ const handleToggleLike = async (post) => {
   } catch (error) {
     console.error("Lỗi khi thao tác like:", error);
   }
-}
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}  ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
 }
 </script>
 

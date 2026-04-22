@@ -40,7 +40,7 @@
               :color="post.isLiked ? '#3b82f6' : '#65676b'"/>
               <span>{{ post.likeCount }}</span>
             </div>
-            <div class="action-btn">
+            <div class="action-btn" @click="emit('openComment', post)">
               <MessageSquare :size="20"/>
               <span>{{ post.commentCount }}</span>
             </div>
@@ -59,6 +59,7 @@ import { MessageSquare, ThumbsUp,  Earth, Users, Bookmark,Lock } from 'lucide-vu
 import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
+import { formatDate, formatTime } from '@/utils/format'
 
 defineProps({
   post: {
@@ -67,11 +68,8 @@ defineProps({
   }
 })
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}  ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
-}
+const emit = defineEmits(['openComment'])
+
 const handleToggleBookmark = async (post) => {
   try {
     if (post.isBookmarked) {

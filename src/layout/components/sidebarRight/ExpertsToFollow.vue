@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref , watch } from 'vue'
+import { ref , watchEffect } from 'vue'
 import { getSuggestedFollowsApi, followUserApi } from '@/api/modules/user.api'
 import defaultAvatar from '@/assets/img/user_default.png'
 import ToastMessage from '@/components/ToastMessage.vue'
@@ -57,12 +57,9 @@ const loadSuggestedFollows = async () => {
   }
 }
 
-watch(
-  () => {
-    loadSuggestedFollows()
-  },
-  { immediate: true }
-)
+watchEffect(() => {
+  loadSuggestedFollows()
+})
 
 const handleFollow = async (userId) => {
   try {

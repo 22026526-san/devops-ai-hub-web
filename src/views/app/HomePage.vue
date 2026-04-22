@@ -30,7 +30,6 @@ const fetchPostsByTopic = async () => {
         PageSize: appStore.pageSize,
         CurrentUserId: authStore.user.userId
       })
-      console.log(res.data)
       posts.value = res.data
     } else {
       const response = await getPostsApi({
