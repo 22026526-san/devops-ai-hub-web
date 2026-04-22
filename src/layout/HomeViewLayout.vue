@@ -37,13 +37,13 @@ import MiniFooter from '@/layout/components/sidebarRight/MiniFooter.vue';
 .head_nav{
     height: 68px;
     width: 100%;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 .main_content{
     width: 100%;
     height: calc(100% - 68px);
     display: flex;
-    gap: 26px;
+    gap: 12px;
     padding: 0 12px;
     box-sizing: border-box;
 }
@@ -59,5 +59,7 @@ import MiniFooter from '@/layout/components/sidebarRight/MiniFooter.vue';
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
 }
 </style>

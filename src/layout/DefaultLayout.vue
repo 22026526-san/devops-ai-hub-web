@@ -25,6 +25,7 @@ import Header from '@/layout/components/Header.vue';
 .head_nav{
     height: 68px;
     width: 100%;
+    margin-bottom: 12px;
 }
 .side_content{
     width: 100%;

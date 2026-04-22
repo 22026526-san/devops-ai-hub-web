@@ -7,6 +7,8 @@ export const useAppStore = defineStore('app', {
     settingMenu: false,
     pageTitle: 'DevOps AI Hub',
     topicSelected: 1,
+    page : 1,
+    pageSize : 20,
   }),
 
   actions: {

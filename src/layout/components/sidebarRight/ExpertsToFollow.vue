@@ -8,104 +8,77 @@
         :key="expert.id" 
         class="expert-item"
       >
-        <img :src="expert.avatar" :alt="expert.name" class="expert-avatar" />
+        <div class="user-avatar-wrapper">
+        <img 
+          :src="expert.avatarUrl ? expert.avatarUrl : defaultAvatar" 
+          alt="User Avatar" 
+          class="user-avatar"
+        />
+      </div>
         
         <div class="expert-info">
-          <span class="expert-name">{{ expert.name }}</span>
-          <span class="expert-role">{{ expert.role }}</span>
+          <span class="expert-name">{{ expert.fullName }}</span>
+          <span class="expert-role">{{ expert.jobTitle ? expert.jobTitle : '' }}</span>
         </div>
         
-        <button class="btn-follow" @click="handleFollow(expert.name)">
+        <button class="btn-follow" @click="handleFollow(expert.userId)">
           <div class="icon-20 icon-plus"></div>
         </button>
       </div>
     </div>
   </div>
+  <ToastMessage 
+    v-model="toastVisible"
+    :text="toastText"
+    :is-success="!isError"
+    :is-error="isError"
+  />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref , watch } from 'vue'
+import { getSuggestedFollowsApi, followUserApi } from '@/api/modules/user.api'
+import defaultAvatar from '@/assets/img/user_default.png'
+import ToastMessage from '@/components/ToastMessage.vue'
 
-// Dữ liệu giả lập chuẩn theo thiết kế
-const experts = ref([
-  {
-    id: 1,
-    name: 'Alex Rivera',
-    role: 'AWS Hero',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    role: 'K8s Contributor',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
-  },
-  {
-    id: 3,
-    name: 'Tom Watson',
-    role: 'Staff SRE',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom'
-  },
-  {
-    id: 1,
-    name: 'Alex Rivera',
-    role: 'AWS Hero',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    role: 'K8s Contributor',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
-  },
-  {
-    id: 3,
-    name: 'Tom Watson',
-    role: 'Staff SRE',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom'
-  },
-  {
-    id: 1,
-    name: 'Alex Rivera',
-    role: 'AWS Hero',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    role: 'K8s Contributor',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
-  },
-  {
-    id: 3,
-    name: 'Tom Watson',
-    role: 'Staff SRE',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom'
-  },
-  {
-    id: 1,
-    name: 'Alex Rivera',
-    role: 'AWS Hero',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    role: 'K8s Contributor',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
-  },
-  {
-    id: 3,
-    name: 'Tom Watson',
-    role: 'Staff SRE',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom'
-  },
-])
 
-const handleFollow = (name) => {
-  console.log(`Đã bấm theo dõi chuyên gia: ${name}`)
-  
+const toastVisible = ref(false)
+const toastText = ref('')
+const isError = ref(false)
+
+const experts = ref([])
+
+const loadSuggestedFollows = async () => {
+  try {
+    const response = await getSuggestedFollowsApi()
+    experts.value = response.data
+  } catch (error) {
+    console.error("Lỗi khi tải danh sách chuyên gia gợi ý:", error)
+  }
 }
+
+watch(
+  () => {
+    loadSuggestedFollows()
+  },
+  { immediate: true }
+)
+
+const handleFollow = async (userId) => {
+  try {
+    await followUserApi(userId)
+  } catch (error) {
+    isError.value = true
+    toastText.value = "Lỗi khi theo dõi chuyên gia: " + error.message
+    toastVisible.value = true
+  } finally {
+    loadSuggestedFollows()
+    isError.value = false
+    toastText.value = "Đã theo dõi chuyên gia thành công!"  
+    toastVisible.value = true
+  }
+}
+
 </script>
 
 <style scoped>

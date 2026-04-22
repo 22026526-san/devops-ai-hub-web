@@ -57,7 +57,6 @@
 </template>
 
 <script setup>
-import BaseInput from '@/components/base/BaseInput.vue';
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.store' 
 import { useAppStore } from '@/stores/app.store' 
@@ -191,24 +190,6 @@ const onSearchClear = () => {
   background-color: #ef4444; 
   border-radius: 50%;
   border: 2px solid #ffffff; 
-}
-
-/* User Avatar */
-.user-avatar-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  padding: 2px;
-  background: linear-gradient(135deg, #a7f3d0, #bae6fd); 
-  cursor: pointer;
-}
-
-.user-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: #e2e8f0;
 }
 .base-input-wrapper[data-v-6f2d2890] {
   margin-bottom: 0;

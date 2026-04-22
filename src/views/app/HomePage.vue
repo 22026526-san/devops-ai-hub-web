@@ -1,49 +1,45 @@
 <template>
-  <div class="create-post-container">
-    <div class="user-avatar-wrapper">
-      <img :src="authStore.user?.avatarUrl ? authStore.user.avatarUrl : defaultAvatar" alt="User Avatar"
-        class="user-avatar" />
-    </div>
-
-    <button class="trigger-input" @click="$emit('open-modal')">
-      {{ authStore.user?.fullName || 'Bạn' }} ơi, bạn đang nghĩ gì thế?
-    </button>
-
-    <div class="action-icons">
-
-      <button class="action-btn" title="Ảnh/Video">
-        <div class="icon-camera"></div>
-      </button>
-
-      <button class="action-btn" title="Video trực tiếp">
-        <div class="icon-code"></div>
-      </button>
-
-    </div>
+  <CreatePost/>
+  <div class="post_list_container">
+    <PostList :items="posts.items" />
   </div>
+  <LoadingPage v-if="appStore.appLoading"/>
 </template>
 
 <script setup>
 import { watch, ref } from 'vue'
 import { useAppStore } from '@/stores/app.store'
-import { getTagsApi, getTagByIdApi } from '@/api/modules/app.api'
-import { useAuthStore } from '@/stores/auth.store'
-import defaultAvatar from '@/assets/img/user_default.png'
+import {useAuthStore} from '@/stores/auth.store'
+import { getPostsApi } from '@/api/modules/app.api'
+import CreatePost from '@/views/components/CreatePost.vue'
+import PostList from "@/views/app/Post/PostList.vue"
+import LoadingPage from '@/components/LoadingPage.vue'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
 
 const posts = ref([])
 
-const fetchPostsByTopic = async (topic) => {
+const fetchPostsByTopic = async () => {
   appStore.setAppLoading(true)
 
   try {
     if (appStore.topicSelected === 1) {
-      const res = await getTagsApi()
+      const res = await getPostsApi({
+        Page: appStore.page,
+        PageSize: appStore.pageSize,
+        CurrentUserId: authStore.user.userId
+      })
+      console.log(res.data)
       posts.value = res.data
     } else {
-      const response = await getTagByIdApi(topic)
+      const response = await getPostsApi({
+        TagIds: appStore.topicSelected,
+        Page: appStore.page,
+        PageSize: appStore.pageSize,
+        CurrentUserId: authStore.user.userId
+      })
+      console.log(response.data)
       posts.value = response.data
     }
 
@@ -58,7 +54,7 @@ watch(
   () => appStore.topicSelected,
   (newTopic) => {
     if (newTopic) {
-      fetchPostsByTopic(newTopic)
+      fetchPostsByTopic()
     }
   },
   { immediate: true }

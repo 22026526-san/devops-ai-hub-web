@@ -1,5 +1,6 @@
 // src/stores/auth.store.js
 import { defineStore } from 'pinia'
+import { USER_ROLES } from '@/common/enums'
 import { loginApi, requestRegisterOtpApi, verifyRegisterOtpApi, requestForgotPasswordOtpApi,resetPasswordApi } from '@/api/modules/auth.api'
 import { getMyInfoApi } from '@/api/modules/user.api'
 
@@ -8,7 +9,7 @@ export const useAuthStore = defineStore('auth', {
     accessToken: localStorage.getItem('access_token') || '',
     user: null,
     authLoading: false,
-    role: 'Guest',
+    role: USER_ROLES.GUEST,
   }),
 
   getters: {
@@ -32,14 +33,14 @@ export const useAuthStore = defineStore('auth', {
     },
 
     setRole (role) {
-      this.role = role || 'Guest'
+      this.role = role || USER_ROLES.GUEST
     },
 
     clearAuth() {
       this.accessToken = ''
       this.user = null
       this.authLoading = false
-      this.role = 'Guest'
+      this.role = USER_ROLES.GUEST
 
       localStorage.removeItem('access_token')
     },
