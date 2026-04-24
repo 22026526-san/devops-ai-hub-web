@@ -5,29 +5,39 @@
         class="user-avatar" />
     </div>
 
-    <button class="trigger-input">
+    <button class="trigger-input" @click="isQuestionPost = true">
       {{ authStore.user?.fullName || 'Bạn' }} ơi, bạn đang nghĩ gì thế?
     </button>
 
     <div class="action-icons">
 
-      <button class="action-btn" title="Ảnh/Video">
-        <div class="icon-camera"></div>
+      <button class="action-btn" @click="isQuestionPost = true; isPipelinePost = false">
+        <Image class="icon-small" style="color: rgb(255 0 0);;" />
       </button>
+      <CreatePostQuestion v-if="isQuestionPost" @close="isQuestionPost = false" @refreshPosts="emit('refreshPosts')"/>
 
-      <button class="action-btn" title="Video trực tiếp">
-        <div class="icon-code"></div>
+
+      <button class="action-btn" @click="isPipelinePost = true; isQuestionPost = false">
+        <Code2 class="icon-small" style="color: rgb(28 188 19);" />
       </button>
-
+     <CreatePostPipeline v-if="isPipelinePost" @close="isPipelinePost = false" @refreshPosts="emit('refreshPosts')"/> 
     </div>
   </div>
 </template>
 
 <script setup>
+import {ref} from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import defaultAvatar from '@/assets/img/user_default.png'
+import CreatePostPipeline from '@/views/components/CreatePostPipeline.vue'
+import CreatePostQuestion from '@/views/components/CreatePostQuestion.vue'
+import { Code2, Image } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
+const isQuestionPost = ref(false)
+const isPipelinePost = ref(false)
+
+const emit = defineEmits(['refreshPosts'])  
 
 </script>
 
@@ -40,10 +50,6 @@ const authStore = useAuthStore()
   padding: 12px 16px;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.icon-camera {
-  margin-top: 2px;
 }
 
 .trigger-input {
@@ -79,5 +85,9 @@ const authStore = useAuthStore()
   cursor: pointer;
   transition: background-color 0.2s ease;
   padding: 0;
+}
+.icon-small {
+  width: 22px;
+  height: 22px;
 }
 </style>
