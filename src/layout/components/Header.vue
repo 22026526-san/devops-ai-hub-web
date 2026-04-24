@@ -10,19 +10,19 @@
       <!-- Navigation Links -->
       <div class="nav-menu">
         <!-- Home (Active) -->
-        <router-link to="/home" class="nav-item" active-class="active">
+        <router-link to="/home" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
           <div class="icon-20 icon-home"></div>
           Trang chủ
         </router-link>
 
         <!-- Explore -->
-        <router-link to="/explore" class="nav-item" active-class="active">
+        <router-link to="/explore" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
           <div class="icon-20 icon-explore"></div>
           Khám phá
         </router-link>
 
         <!-- AI Agent -->
-        <router-link to="/ai-agent" class="nav-item" active-class="active">
+        <router-link to="/ai-agent" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
           <div class="icon-20 icon-ai"></div>
           Trợ lý AI
         </router-link>

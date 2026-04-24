@@ -12,7 +12,7 @@
         v-for="tag in topics" 
         :key="tag.name" 
         class="tag-item"
-        :class="{ 'is-active': idActive === tag.id }"
+        :class="{ 'is-active': appStore.topicSelected === tag.id }"
         @click="handleClickTag(tag)"
       >
         <div class="tag-left">
@@ -37,7 +37,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const appStore = useAppStore()
 const topics = ref([]);
-const idActive = ref(null)
 
 const fetchTopics = async () => {
   appStore.setAppLoading(true)
@@ -57,7 +56,6 @@ onMounted(() => {
 
 const handleClickTag = (tag) => {
   appStore.setTopicSelected(tag.id)
-  idActive.value = tag.id
   router.push({ 
     name: 'home', 
     params: { id: tag.id } 

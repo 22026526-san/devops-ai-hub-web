@@ -23,8 +23,8 @@
       :isOpen="isModalOpen" 
       :post="selectedPost" 
       :comments="apiCommentList"
-      @close="isModalOpen = false"
-      @refreshComments="handdleOpenModal(selectedPost)"
+      @close="handdleCloseModal"
+      @refreshComments="handdleOpenModal(selectedPost.id)"
     />
 
     <ToastMessage 
@@ -40,7 +40,7 @@
 import { ref } from 'vue'
 import PipelineCard from '@/views/components/PipelineCard.vue';
 import QuestionCard from '@/views/components/QuestionCard.vue';
-import { getPostCommentsApi } from '@/api/modules/app.api';
+import { getPostCommentsApi, getPostByIdApi } from '@/api/modules/app.api';
 import PostDetailModal from '@/views/app/Post/PostDetailModal.vue'
 import ToastMessage from '@/components/ToastMessage.vue';
 
@@ -51,6 +51,8 @@ defineProps({
   }
 })
 
+const emit = defineEmits(['refreshPosts'])
+
 const isModalOpen = ref(false)
 const apiCommentList = ref([])
 const toastVisible = ref(false)
@@ -58,11 +60,12 @@ const toastText = ref('')
 const isError = ref(false)
 const selectedPost = ref(null)
 
-const handdleOpenModal = async (postData) => {
-  selectedPost.value = postData
+const handdleOpenModal = async (postid) => {
   try {
-    const response = await getPostCommentsApi(postData.id)
+    const response = await getPostCommentsApi(postid)
     apiCommentList.value = response.data
+    const post = await getPostByIdApi(postid)
+    selectedPost.value = post.data
   } catch (error) {
     isError.value = true
     toastText.value = "Lỗi khi tải bình luận: " + error.message
@@ -70,6 +73,11 @@ const handdleOpenModal = async (postData) => {
   } finally {
     isModalOpen.value = true
   }
+}
+
+const handdleCloseModal = () => {
+  isModalOpen.value = false
+  emit('refreshPosts')
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
-  <CreatePost/>
+  <CreatePost @refreshPosts="fetchPostsByTopic"/>
   <div class="post_list_container">
-    <PostList :items="posts.items" />
+    <PostList :items="posts.items" @refreshPosts="fetchPostsByTopic"/>
   </div>
   <LoadingPage v-if="appStore.appLoading"/>
 </template>

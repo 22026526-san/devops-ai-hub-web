@@ -14,21 +14,24 @@
         </div>
         <div class="post_time">{{ formatDate(post.createdAt) }}</div>
       </div>
-      <div class="post_options" @click="handleToggleBookmark(post)">
+      <div class="post_options" @click="handleToggleBookmark(post)" v-if="!appStore.isProfileOpen">
         <Bookmark :size="22" :color="post.isBookmarked ? '#dbea10': '#65676b'"/>
+      </div>
+      <div class="post_options" v-if="appStore.isProfileOpen">
+        <Ellipsis :size="22" :color="'#65676b'"/>
       </div>
     </div>
 
     <div class="post_body-text">
       <h3 class="post_title">{{ post.title }}</h3>
-      <p class="post_question-content" v-if="post.detail">{{ post.detail.content }}</p>
+      <div class="post_question-content" v-if="post.detail" v-html="post.detail.content"></div>
       <div class="post_tags">
         <span v-for="tag in post.tags" :key="tag.id">#{{ tag.name }}</span>
       </div>
     </div>
 
-        <div class="post_media" v-if="post.detail && post.detail.authorImage">
-        <img :src="post.detail.authorImage" alt="Ảnh đính kèm" class="post_image" />
+    <div class="post_media" v-if="post.detail && post.detail.imgUrl">
+        <img :src="post.detail.imgUrl" alt="Ảnh đính kèm" class="post_image" />
     </div>
 
     <div class="post_footer">
@@ -40,7 +43,7 @@
               :color="post.isLiked ? '#3b82f6' : '#65676b'"/>
               <span>{{ post.likeCount }}</span>
             </div>
-            <div class="action-btn" @click="emit('openComment', post)">
+            <div class="action-btn" @click="emit('openComment', post.id)">
               <MessageSquare :size="20"/>
               <span>{{ post.commentCount }}</span>
             </div>
@@ -55,11 +58,14 @@
 </template>
 
 <script setup>
-import { MessageSquare, ThumbsUp,  Earth, Users, Bookmark,Lock } from 'lucide-vue-next';
+import { MessageSquare, ThumbsUp,  Earth, Users, Bookmark,Lock, Ellipsis } from 'lucide-vue-next';
 import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
 import { formatDate, formatTime } from '@/utils/format'
+import { useAppStore } from '@/stores/app.store';
+
+const appStore = useAppStore()
 
 defineProps({
   post: {
