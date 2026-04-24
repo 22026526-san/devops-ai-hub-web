@@ -9,6 +9,7 @@ export const useAppStore = defineStore('app', {
     topicSelected: 1,
     page : 1,
     pageSize : 20,
+    isProfileOpen : false,
   }),
 
   actions: {

@@ -74,20 +74,27 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore()
+  console.log(`[Router] Đang cố gắng đi từ: ${from.path} ---> đến: ${to.path}`);
 
   try {
     if (to.path === '/login' && authStore.isAuthenticated) {
+      console.log('Người dùng đã đăng nhập, bị đẩy về Home.')
       return '/home'
     }
 
     if (!to.meta.public && !authStore.isAuthenticated) {
+      console.log('Người dùng chưa đăng nhập, bị đẩy về Login.')
       return '/login'
     }
 
     if (authStore.isAuthenticated && !authStore.user) {
+      console.log('1. Đang gọi API lấy thông tin User...'); 
+      
       const result = await authStore.fetchMyInfo()
+      console.log('2. Kết quả trả về từ API:', result); 
 
       if (!result?.success) {
+        console. log('3. Lỗi lấy User! Bị đẩy về Login.');
         authStore.clearAuth()
         return '/login'
       }

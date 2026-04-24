@@ -14,6 +14,7 @@ import { getPostsApi } from '@/api/modules/app.api'
 import CreatePost from '@/views/components/CreatePost.vue'
 import PostList from "@/views/app/Post/PostList.vue"
 import LoadingPage from '@/components/LoadingPage.vue'
+import { USER_ROLES } from '@/common/enums'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
@@ -25,21 +26,37 @@ const fetchPostsByTopic = async () => {
 
   try {
     if (appStore.topicSelected === 1) {
-      const res = await getPostsApi({
-        Page: appStore.page,
-        PageSize: appStore.pageSize,
-        CurrentUserId: authStore.user.userId
-      })
-      posts.value = res.data
+      if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
+        const response = await getPostsApi({
+          Page: appStore.page,
+          PageSize: appStore.pageSize,
+          CurrentUserId: authStore.user.userId
+        })
+        posts.value = response.data
+      } else {
+        const response = await getPostsApi({
+          Page: appStore.page,
+          PageSize: appStore.pageSize
+        })
+        posts.value = response.data
+      }
     } else {
-      const response = await getPostsApi({
-        TagIds: appStore.topicSelected,
-        Page: appStore.page,
-        PageSize: appStore.pageSize,
-        CurrentUserId: authStore.user.userId
-      })
-      console.log(response.data)
-      posts.value = response.data
+      if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
+        const response = await getPostsApi({
+          TagId: appStore.topicSelected,
+          Page: appStore.page,
+          PageSize: appStore.pageSize,
+          CurrentUserId: authStore.user.userId
+        })
+        posts.value = response.data
+      } else {
+        const response = await getPostsApi({
+          TagId: appStore.topicSelected,
+          Page: appStore.page,
+          PageSize: appStore.pageSize
+        })
+        posts.value = response.data
+      }
     }
 
   } catch (error) {

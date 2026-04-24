@@ -2,7 +2,7 @@
   <div class="layout-wrapper">
     <!-- Header -->
     <header class="header">
-      <div class="logo-area">
+      <div class="logo-area" @click="router.push('/home')" style="cursor: pointer;">
         <img src="@/assets/img/logo_devops_hub.png" alt="DevOps Connect Logo" class="logo-icon" />
         <span class="logo-text">DevOps Connect</span>
       </div>

@@ -77,7 +77,8 @@
                             <div class="icon-20 icon-logout"></div>
                         </div>
                         <div class="item-content" @click="handleLogout">
-                            <span class="main-text">Đăng xuất</span>
+                            <span class="main-text" v-if="authStore.role === USER_ROLES.GUEST">Đăng nhập</span>
+                            <span class="main-text" v-else>Đăng xuất</span>
                         </div>
                     </div>
 
@@ -89,6 +90,7 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth.store'
 import defaultAvatar from '@/assets/img/user_default.png'
+import { USER_ROLES } from '@/common/enums'
 
 const authStore = useAuthStore()
 

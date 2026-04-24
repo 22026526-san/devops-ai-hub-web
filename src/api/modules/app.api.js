@@ -63,3 +63,23 @@ export const updateCommentApi = async (id, payload) => {
 export const deleteCommentApi = async (id) => {
   return axiosInstance.delete(`/comments/${id}`)
 }
+
+export const getPostByIdApi = (id) => {
+  return axiosInstance.get(`/posts/${id}`)
+}
+
+export const updatePostApi = (id, data) => {
+  return axiosInstance.put(`/posts/${id}`, data)
+}
+
+export const deletePostApi = (id) => {
+  return axiosInstance.delete(`/posts/${id}`)
+}
+
+export const createQuestionPostApi = (data) => {
+  return axiosInstance.post('/posts/question', data)
+}
+
+export const createPipelinePostApi = (data) => {
+  return axiosInstance.post('/posts/pipeline', data)
+}
