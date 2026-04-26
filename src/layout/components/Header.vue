@@ -10,7 +10,7 @@
       <!-- Navigation Links -->
       <div class="nav-menu">
         <!-- Home (Active) -->
-        <router-link to="/home" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
+        <router-link to="/home" class="nav-item" active-class="active" @click="toHomePage">
           <div class="icon-20 icon-home"></div>
           Trang chủ
         </router-link>
@@ -33,7 +33,7 @@
     <div class="header-right">
       <!-- Search Box -->
       <BaseSearch
-        v-model="searchQuery"
+        v-model="appStore.filters.Search"
         placeholder="Tìm kiếm..."
         @search="onSearchSubmit"
         @clear="onSearchClear"
@@ -63,20 +63,28 @@ import { useAppStore } from '@/stores/app.store'
 import defaultAvatar from '@/assets/img/user_default.png'
 import SettingsMenu from '@/components/SettingsMenu.vue';
 import BaseSearch from '@/components/base/BaseSearch.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 const authStore = useAuthStore()
 const appStore = useAppStore()
 
-const searchQuery = ref('')
-
 const hasUnreadNotifications = ref(true)
 
-const onSearchSubmit = (text) => {
-  console.log('Người dùng vừa nhấn Enter tìm kiếm:', searchQuery.value)
+const onSearchSubmit = () => {
+  router.push({ 
+    name: 'search', 
+    query: { text:appStore.filters.Search } 
+  })
 }
 
 const onSearchClear = () => {
-  console.log('Đã xóa trắng tìm kiếm')
+  appStore.filters.Search = null;
+}
+
+const toHomePage = () => {
+  appStore.setTopicSelected(1);
+  appStore.resetFilters();
 }
 </script>
 

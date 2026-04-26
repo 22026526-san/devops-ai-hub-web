@@ -6,12 +6,12 @@
             </div>
 
             <div class="comment-content-area">
-                <div class="comment-bubble" v-if="!showEditInput">
+                <div class="comment-bubble" v-if="!showEditInput && comment.content">
                     <span class="comment-author">{{ comment.authorUsername }}</span>
                     <span class="comment-text">{{ comment.content }}</span>
                 </div>
 
-                <div v-if="comment.imgUrl" class="image-preview-container" @click="handleOpenImage(comment.imgUrl)">
+                <div v-if="comment.imgUrl && !showEditInput" class="image-preview-container" @click="handleOpenImage(comment.imgUrl)">
                     <img :src="comment.imgUrl" alt="Preview" class="image-preview" />
                 </div>
 
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import defaultAvatar from '@/assets/img/user_default.png'
 import { formatDate } from '@/utils/format'
 import { useAuthStore } from '@/stores/auth.store'
@@ -62,9 +62,17 @@ const emit = defineEmits(['sendReply', 'editComment', 'deleteComment'])
 
 
 const showReplyInput = ref(false)
-const newReply = ref('')
+const newReply = reactive({
+    content: null,
+    imageFile: null,
+    parentId: props.comment.id
+})
 const showEditInput = ref(false)
-const newEdit = ref('')
+const newEdit = reactive({
+    content: props.comment.content,
+    imageFile: props.comment.imgUrl ? props.comment.imgUrl : null,
+    commentId: props.comment.id
+})
 const showAll = ref(false)
 
 const INITIAL_VISIBLE = 2
@@ -73,19 +81,17 @@ const remainingCount = computed(() => Math.max(0, (props.comment.replies?.length
 
 const toggleEdit = () => {
     showEditInput.value = !showEditInput.value
-    newEdit.value = props.comment.content
+    newEdit.imageFile = props.comment.imgUrl ? props.comment.imgUrl : null
     showReplyInput.value = false
 }
 
-const submitEdit = (imageFile) => {
-    if (newEdit.value.trim() === '') return
-    emit('editComment', { commentId: props.comment.id, content: newEdit.value, imageFile: imageFile })
+const submitEdit = () => {
+    emit('editComment', newEdit)
     showEditInput.value = false
 }
 
-const submitReply = (imageFile) => {
-    if (newReply.value.trim() === '') return
-    emit('sendReply', { parentId: props.comment.id, content: newReply.value, imageFile: imageFile })
+const submitReply = () => {
+    emit('sendReply', newReply)
     showReplyInput.value = false
     newReply.value = ''
 }

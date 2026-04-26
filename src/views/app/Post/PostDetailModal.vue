@@ -33,12 +33,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { reactive, ref,watch } from 'vue'
 import QuestionCard from '@/views/components/QuestionCard.vue'
 import PipelineCard from '@/views/components/PipelineCard.vue'
 import CommentItem from '@/views/components/CommentItem.vue'
 import CreateComment from '@/views/components/CreateComment.vue'
-import { createCommentApi, replyCommentApi, updateCommentApi, deleteCommentApi } from '@/api/modules/app.api'
+import { useAppStore } from '@/stores/app.store'
+import { createCommentApi, replyCommentApi, updateCommentApi, deleteCommentApi, getPipelineVersionsApi } from '@/api/modules/app.api'
 
 
 
@@ -49,79 +50,110 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close','refreshComments'])
+const appStore = useAppStore()
+const newComment = reactive({
+    content: '',
+    imageFile: null
+})
+const postVersionData = ref(null)
 
-const newComment = ref('')
+const fetchPostVersion = async () => {
+    try {
+        const response = await getPipelineVersionsApi(props.post.id)
+        postVersionData.value = response.data
+    } catch (error) {
+        console.error('Error fetching post version:', error)
+    }
+}
 
 const closeModal = () => {
     emit('close')
 }
 
 
-const handleSendComment = async (imageFile) => {
+const handleSendComment = async () => {
+    appStore.setAppLoading(true)
     try {
         const formData = new FormData()
 
         formData.append('PostId', props.post.id)
        
-        formData.append('Content', newComment.value)
-        
-        if (imageFile) {
-            console.log('Attaching image to comment:', imageFile)
-            formData.append('Image', imageFile)
+        formData.append('Content', newComment.content)
+
+        if (newComment.imageFile) {
+            console.log('Attaching image to comment:', newComment.imageFile)
+            formData.append('Image', newComment.imageFile)
         }
         await createCommentApi(formData)
-        emit('refreshComments')
     } catch (error) {
         console.error('Error sending comment:', error)
      } finally {
-        newComment.value = ''
+        newComment.content = ''
+        newComment.imageFile = null
+        emit('refreshComments')
+        appStore.setAppLoading(false)
      }
 }
 
 
-const handleSendReply = async ({ parentId, content, imageFile }) => {
-    console.log('Replying to comment', parentId, 'with content:', content)
+const handleSendReply = async (commentReply) => {
+    appStore.setAppLoading(true)
     try {
         const formData = new FormData()
         
-        formData.append('Content', content)
+        formData.append('Content', commentReply.content)
         
-        if (imageFile) {
-            formData.append('Image', imageFile)
+        if (commentReply.imageFile) {
+            formData.append('Image', commentReply.imageFile)
         }
-        await replyCommentApi(parentId, formData)
+        await replyCommentApi(commentReply.parentId, formData)
     } catch (error) {
         console.error('Error sending reply:', error)
      } finally {
         emit('refreshComments')
+        appStore.setAppLoading(false)
      }
 }
 
 
-const handleEditComment = async ({ commentId, content, imageFile }) => {
+const handleEditComment = async (commentEdit) => {
+    appStore.setAppLoading(true)
     try {
         const formData = new FormData()
         
-        formData.append('Content', content)
+        formData.append('Content', commentEdit.content)
         
-        if (imageFile) {
-            formData.append('Image', imageFile)
+        if (commentEdit.imageFile) {
+            formData.append('Image', commentEdit.imageFile)
         }
-        await updateCommentApi(commentId, formData)
-        emit('refreshComments')
+        await updateCommentApi(commentEdit.commentId, formData)
     } catch (error) {
         console.error('Error editing comment:', error)
      } finally {
+        appStore.setAppLoading(false)
         emit('refreshComments')
      }
 }
 
 
 const handleDeleteComment = async (commentId) => {
-    await deleteCommentApi(commentId)
-    emit('refreshComments')
+    appStore.setAppLoading(true)
+    try {
+        await deleteCommentApi(commentId)
+        emit('refreshComments')
+    } catch (error) {
+        console.error('Error deleting comment:', error)
+    } finally {
+        appStore.setAppLoading(false)
+    }
 }
-
+watch(() => props.isOpen, (newVal) => {
+    if (newVal === true && props.post?.postType === 'Pipeline') {
+        fetchPostVersion()
+    } else {
+        postVersionData.value = null
+    }
+})
 </script>
 
 <style scoped>

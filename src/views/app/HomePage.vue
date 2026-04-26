@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { watch, ref } from 'vue'
+import { watch, ref} from 'vue'
 import { useAppStore } from '@/stores/app.store'
 import {useAuthStore} from '@/stores/auth.store'
 import { getPostsApi } from '@/api/modules/app.api'
@@ -19,44 +19,19 @@ import { USER_ROLES } from '@/common/enums'
 const appStore = useAppStore()
 const authStore = useAuthStore()
 
-const posts = ref([])
 
+const posts = ref([])
+const { filters } = appStore
 const fetchPostsByTopic = async () => {
   appStore.setAppLoading(true)
-
   try {
-    if (appStore.topicSelected === 1) {
-      if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
-        const response = await getPostsApi({
-          Page: appStore.page,
-          PageSize: appStore.pageSize,
-          CurrentUserId: authStore.user.userId
-        })
-        posts.value = response.data
-      } else {
-        const response = await getPostsApi({
-          Page: appStore.page,
-          PageSize: appStore.pageSize
-        })
-        posts.value = response.data
-      }
+    if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
+      filters.CurrentUserId = authStore.user?.userId
+      const response = await getPostsApi(filters)
+      posts.value = response.data
     } else {
-      if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
-        const response = await getPostsApi({
-          TagId: appStore.topicSelected,
-          Page: appStore.page,
-          PageSize: appStore.pageSize,
-          CurrentUserId: authStore.user.userId
-        })
-        posts.value = response.data
-      } else {
-        const response = await getPostsApi({
-          TagId: appStore.topicSelected,
-          Page: appStore.page,
-          PageSize: appStore.pageSize
-        })
-        posts.value = response.data
-      }
+      const response = await getPostsApi(filters)
+      posts.value = response.data
     }
 
   } catch (error) {
@@ -67,14 +42,16 @@ const fetchPostsByTopic = async () => {
 }
 
 watch(
-  () => appStore.topicSelected,
+  () => appStore.selectedTopic,
+
   (newTopic) => {
     if (newTopic) {
       fetchPostsByTopic()
     }
   },
-  { immediate: true }
+  {immediate:true}
 )
+
 
 </script>
 

@@ -6,7 +6,7 @@ import { getMyInfoApi } from '@/api/modules/user.api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    accessToken: localStorage.getItem('access_token') || '',
+    accessToken: '',
     user: null,
     authLoading: false,
     role: USER_ROLES.GUEST,
@@ -19,13 +19,7 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     setAccessToken(token) {
-      this.accessToken = token || ''
-
-      if (token) {
-        localStorage.setItem('access_token', token)
-      } else {
-        localStorage.removeItem('access_token')
-      }
+      this.accessToken = token || '';
     },
 
     setUser(user) {
@@ -41,8 +35,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.authLoading = false
       this.role = USER_ROLES.GUEST
-
-      localStorage.removeItem('access_token')
+      this.accessToken = ''
     },
 
     async login(payload) {
@@ -59,7 +52,6 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.setAccessToken(accessToken)
-        this.setRole(data?.role)
 
         const profileResult = await this.fetchMyInfo()
 
@@ -90,6 +82,7 @@ export const useAuthStore = defineStore('auth', {
         const user = response?.data
 
         this.setUser(user)
+        this.setRole(user?.role)
 
         return {
           success: true,
@@ -200,4 +193,9 @@ export const useAuthStore = defineStore('auth', {
       window.location.href = '/login'
     },
   },
+  persist: 
+    {
+      pick: ['accessToken'],
+      storage: localStorage,
+    },
 })

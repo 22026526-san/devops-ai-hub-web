@@ -247,7 +247,7 @@ const handleSubmit = async () => {
                 <div class="submit-btn-wrapper">
                     <button class="submit-btn" @click="handleSubmit">
                         <Save class="icon" />
-                        Tạo Pipeline
+                        Tạo Bài Viết
                     </button>
                 </div>
             </div>

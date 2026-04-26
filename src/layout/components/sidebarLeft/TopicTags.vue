@@ -12,7 +12,7 @@
         v-for="tag in topics" 
         :key="tag.name" 
         class="tag-item"
-        :class="{ 'is-active': appStore.topicSelected === tag.id }"
+        :class="{ 'is-active': appStore.filters.TagIds === tag.id }"
         @click="handleClickTag(tag)"
       >
         <div class="tag-left">
@@ -32,9 +32,10 @@
 import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/stores/app.store'
 import { getTagsApi } from '@/api/modules/app.api'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const appStore = useAppStore()
 const topics = ref([]);
 
@@ -56,9 +57,11 @@ onMounted(() => {
 
 const handleClickTag = (tag) => {
   appStore.setTopicSelected(tag.id)
-  router.push({ 
-    name: 'home', 
-    params: { id: tag.id } 
+  router.replace({ 
+    query: { 
+      ...route.query, 
+      tagId: tag.id   
+    } 
   })
 }
 </script>

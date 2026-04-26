@@ -64,8 +64,10 @@ const handdleOpenModal = async (postid) => {
   try {
     const response = await getPostCommentsApi(postid)
     apiCommentList.value = response.data
-    const post = await getPostByIdApi(postid)
-    selectedPost.value = post.data
+    if (!isModalOpen.value) {
+      const post = await getPostByIdApi(postid)
+      selectedPost.value = post.data
+    }
   } catch (error) {
     isError.value = true
     toastText.value = "Lỗi khi tải bình luận: " + error.message

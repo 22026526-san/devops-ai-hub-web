@@ -14,14 +14,14 @@
         </div>
         <div class="post_time">{{ formatDate(post.createdAt) }}</div>
       </div>
-      <div class="post_options" v-if="!appStore.isProfileOpen">
+      <div class="post_options" v-if="post.authorId !== authStore.user?.userId">
         <Bookmark 
         :size="22"
         :color="post.isBookmarked ? '#dbea10': '#65676b'"
         @click="handleToggleBookmark(post)"
         />
       </div>
-      <div class="post_options" v-if="appStore.isProfileOpen">
+      <div class="post_options" v-if="post.authorId === authStore.user?.userId">
         <Ellipsis 
         :size="22"
         :color="'#65676b'"
@@ -41,8 +41,15 @@
     <div class="post_media" v-if="post.detail && post.detail.pipelineContent !== undefined">
       <div class="code-editor-container">
         <div class="code-header">
-          <span>Platform: {{ post.detail.platform }} | Dạng: {{ post.detail.pipelineFormat }}</span>
-
+          <span>.yaml</span>
+          <div style="display: flex; gap: 12px;align-items: center;">
+            <div  @click="handleSaveCode">
+              <Save :size="24"/>
+            </div>
+            <div  @click="handleEditCode">
+              <SquarePen :size="24"/>
+            </div>
+          </div>
         </div>
         
         <VueMonacoEditor
@@ -85,14 +92,14 @@
 <script setup>
 import { ref } from 'vue'
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
-import { MessageSquare, ThumbsUp,  Earth, Users,Bookmark,Lock, Ellipsis } from 'lucide-vue-next';
+import { MessageSquare, ThumbsUp,  Earth, Users,Bookmark,Lock, Ellipsis, Save,SquarePen } from 'lucide-vue-next';
 import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
 import { formatDate, formatTime } from '@/utils/format'
-import { useAppStore } from '@/stores/app.store';
+import { useAuthStore } from '@/stores/auth.store';
 
-const appStore = useAppStore()  
+const authStore = useAuthStore()
 
 const props = defineProps({
   post: {
@@ -117,6 +124,10 @@ const editorOptions = {
 const handleSaveCode = () => {
   console.log("Code mới sẽ được lưu là:\n", editableCode.value)
   alert('Đã lưu code! Xem trong console.')
+}
+
+const handleEditCode = () => {
+  editorOptions.readOnly = false;
 }
 
 const handleToggleBookmark = async (post) => {
@@ -164,7 +175,9 @@ const handleToggleLike = async (post) => {
   color: #d4d4d4;
   padding: 8px 16px;
   font-size: 13px;
-  font-family: monospace;
   border-bottom: 1px solid #404040;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

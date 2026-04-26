@@ -83,3 +83,19 @@ export const createQuestionPostApi = (data) => {
 export const createPipelinePostApi = (data) => {
   return axiosInstance.post('/posts/pipeline', data)
 }
+
+export const getPipelineByPostIdApi = (postId) => {
+  return axiosInstance.get(`/pipelines/${postId}`)
+}
+
+export const getPipelineVersionsApi = (postId) => {
+  return axiosInstance.get(`/pipelines/${postId}/versions`)
+}
+
+export const createPipelineVersionApi = (postId, data) => {
+  return axiosInstance.post(`/pipelines/${postId}/versions`, data)
+}
+
+export const getPipelineVersionByIdApi = (versionId) => {
+  return axiosInstance.get(`/pipelines/versions/${versionId}`)
+}

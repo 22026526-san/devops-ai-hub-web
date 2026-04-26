@@ -5,11 +5,20 @@ export const useAppStore = defineStore('app', {
   state: () => ({
     appLoading: false,
     settingMenu: false,
-    pageTitle: 'DevOps AI Hub',
-    topicSelected: 1,
-    page : 1,
-    pageSize : 20,
-    isProfileOpen : false,
+    isMyProfile : false,
+    selectedTopic:1,
+    filters: {
+      Search: null,
+      TagIds: null,
+      FilterUserId: null,
+      CurrentUserId: null,
+      Year: null,
+      Month: null,
+      Day: null,
+      SortBy: null,
+      Page : 1,
+      PageSize : 20,
+    }
   }),
 
   actions: {
@@ -21,13 +30,44 @@ export const useAppStore = defineStore('app', {
       this.settingMenu = value
     },
 
-    setPageTitle(title) {
-      this.pageTitle = title || 'DevOps AI Hub'
-      document.title = this.pageTitle
+    setTopicSelected(topic) {
+      this.selectedTopic = topic
+      if (topic === 1) {
+        this.filters.TagIds = null;
+      } else {
+        this.filters.TagIds = topic
+      }
+    },
+    setPage(pageNumber) {
+      this.Page = pageNumber
     },
 
-    setTopicSelected(topic) {
-      this.topicSelected = topic
+    setPageSize(size) {
+      this.PageSize = size
+    },
+
+    nextPage() {
+      this.filters.Page += 1
+    },
+    prevPage(){
+      if (this.filters.Page > 0) {
+        this.filters.Page -= 1
+      }
+    },
+    resetFilters() {
+      this.filters = {
+        Search: null,
+        TagIds: null,
+        FilterUserId: null,
+        CurrentUserId: null,
+        Year: null,
+        Month: null,
+        Day: null,
+        SortBy: null,
+        Page : 1,
+        PageSize : 20,
+      }
     }
   },
+  persist: {storage: sessionStorage},
 })

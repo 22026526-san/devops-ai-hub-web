@@ -14,11 +14,11 @@
         </div>
         <div class="post_time">{{ formatDate(post.createdAt) }}</div>
       </div>
-      <div class="post_options" @click="handleToggleBookmark(post)" v-if="!appStore.isProfileOpen">
+      <div class="post_options" @click="handleToggleBookmark(post)" v-if="post.authorId !== authStore.user?.userId">
         <Bookmark :size="22" :color="post.isBookmarked ? '#dbea10': '#65676b'"/>
       </div>
-      <div class="post_options" v-if="appStore.isProfileOpen">
-        <Ellipsis :size="22" :color="'#65676b'"/>
+      <div class="post_options" v-if="post.authorId === authStore.user?.userId">
+         <Ellipsis :size="22" :color="'#65676b'"/>
       </div>
     </div>
 
@@ -63,9 +63,9 @@ import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
 import { formatDate, formatTime } from '@/utils/format'
-import { useAppStore } from '@/stores/app.store';
+import { useAuthStore } from '@/stores/auth.store';
 
-const appStore = useAppStore()
+const authStore = useAuthStore()
 
 defineProps({
   post: {
