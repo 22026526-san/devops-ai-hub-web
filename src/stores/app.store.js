@@ -5,7 +5,9 @@ export const useAppStore = defineStore('app', {
   state: () => ({
     appLoading: false,
     settingMenu: false,
-    isMyProfile : false,
+    idProfile : 1,
+    isFetchProfile:false,
+    isUnFollow:false,
     selectedTopic:1,
     filters: {
       Search: null,

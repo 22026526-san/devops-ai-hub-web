@@ -1,7 +1,7 @@
 <template>
     <div class="comment-wrapper">
         <div class="comment-main">
-            <div class="comment-avatar">
+            <div class="comment-avatar" @click="handleInfo(comment.authorId)">
                 <img :src="comment.authorAvatarUrl || defaultAvatar" alt="Avatar" />
             </div>
 
@@ -18,7 +18,7 @@
                 <CreateComment v-if="showEditInput" @submitComment="submitEdit" v-model="newEdit" />
 
                 <div class="comment-actions" v-if="!showEditInput">
-                    <span class="action-time">{{ formatDate(comment.createdAt) }}</span>
+                    <span class="action-time">{{ formatDateTime(comment.createdAt) }}</span>
                     <span class="action-reply font-bold" @click="showReplyInput = !showReplyInput">Trả lời</span>
                     <span class="action-reply font-bold" v-if="authStore.user?.userId === comment.authorId"
                         @click="toggleEdit">Chỉnh sửa</span>
@@ -46,12 +46,16 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import defaultAvatar from '@/assets/img/user_default.png'
-import { formatDate } from '@/utils/format'
+import { formatDateTime } from '@/utils/format'
 import { useAuthStore } from '@/stores/auth.store'
 import CreateComment from './CreateComment.vue'
+import { useAppStore } from '@/stores/app.store'
+import { useRouter } from 'vue-router'
 
 
 const authStore = useAuthStore()
+const appStore = useAppStore()
+const router = useRouter()
 
 const props = defineProps({
     comment: { type: Object, required: true },
@@ -62,13 +66,13 @@ const emit = defineEmits(['sendReply', 'editComment', 'deleteComment'])
 
 
 const showReplyInput = ref(false)
-const newReply = reactive({
+let newReply = reactive({
     content: null,
     imageFile: null,
     parentId: props.comment.id
 })
 const showEditInput = ref(false)
-const newEdit = reactive({
+let newEdit = reactive({
     content: props.comment.content,
     imageFile: props.comment.imgUrl ? props.comment.imgUrl : null,
     commentId: props.comment.id
@@ -100,6 +104,14 @@ const handleOpenImage = (url) => {
     if (!url) return;
     window.open(url, '_blank');
 }
+
+const handleInfo = (id) => {
+    appStore.idProfile = id
+    router.push({ 
+        name: 'profile', 
+        query: { id: id } 
+    }) 
+}
 </script>
 
 <style scoped>
@@ -117,6 +129,7 @@ const handleOpenImage = (url) => {
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+    cursor: pointer;
 }
 
 .comment-content-area {

@@ -1,7 +1,12 @@
-export const formatDate = (dateString) => {
+export const formatDateTime = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}  ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+}
+export const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
 }
 
 export const formatTime = (dateString) => {

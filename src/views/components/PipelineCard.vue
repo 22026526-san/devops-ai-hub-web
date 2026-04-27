@@ -1,7 +1,7 @@
 <template>
   <div class="post_card">
     <div class="post_header">
-      <div class="user-avatar-wrapper">
+      <div class="user-avatar-wrapper" @click="handleInfo(post.authorId)">
         <img :src="post.authorImage ? post.authorImage : defaultAvatar" alt="User Avatar"
           class="user-avatar" />
       </div>
@@ -12,7 +12,7 @@
           <Users v-if="post.visibility === POST_VISIBILITY.FOLLOWERS" :size="14" color="#65676b"/>
           <Lock :size="14" color="#65676b" v-if="post.visibility === POST_VISIBILITY.PRIVATE"/>
         </div>
-        <div class="post_time">{{ formatDate(post.createdAt) }}</div>
+        <div class="post_time">{{ formatDateTime(post.createdAt) }}</div>
       </div>
       <div class="post_options" v-if="post.authorId !== authStore.user?.userId">
         <Bookmark 
@@ -96,10 +96,14 @@ import { MessageSquare, ThumbsUp,  Earth, Users,Bookmark,Lock, Ellipsis, Save,Sq
 import defaultAvatar from '@/assets/img/user_default.png'
 import {  POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi } from '@/api/modules/app.api';
-import { formatDate, formatTime } from '@/utils/format'
+import { formatDateTime, formatTime } from '@/utils/format'
 import { useAuthStore } from '@/stores/auth.store';
+import { useAppStore } from '@/stores/app.store';
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore()
+const appStore = useAppStore()  
+const router = useRouter()
 
 const props = defineProps({
   post: {
@@ -160,6 +164,14 @@ const handleToggleLike = async (post) => {
   } catch (error) {
     console.error("Lỗi khi thao tác like:", error);
   }
+}
+
+const handleInfo = (id) => {
+  appStore.idProfile = id
+  router.push({ 
+      name: 'profile', 
+      query: { id: id } 
+  }) 
 }
 </script>
 

@@ -7,6 +7,9 @@ import Register from '@/views/auth/Register.vue'
 import ForgotPassword from '@/views/auth/ForgotPassword.vue'
 import HomeViewLayout from '@/layout/HomeViewLayout.vue'
 import SearchPage from '@/views/app/SearchPage.vue'
+import ProfileLayout from '@/layout/ProfileLayout.vue'
+import ProfilePage from '@/views/app/ProfilePage.vue'
+import { useAppStore } from '@/stores/app.store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,11 +82,21 @@ const router = createRouter({
         layout: DefaultLayout
       },
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfilePage,
+      meta: { 
+        public: true ,
+        layout: ProfileLayout
+      },
+    },
   ],
 })
 
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore()
+  const appStore = useAppStore()
 
   try {
     if (to.path === '/login' && authStore.isAuthenticated) {
@@ -102,6 +115,11 @@ router.beforeEach(async (to, from) => {
         authStore.clearAuth()
         return '/login'
       }
+    }
+
+    if (to.path === '/home') {
+      appStore.setTopicSelected(1)
+      appStore.resetFilters()
     }
 
     return true

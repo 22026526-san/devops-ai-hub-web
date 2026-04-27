@@ -5,8 +5,9 @@
     <div class="expert-list">
       <div 
         v-for="expert in experts" 
-        :key="expert.id" 
+        :key="expert.userId" 
         class="expert-item"
+        @click="handleInfo(expert.userId)"
       >
         <div class="user-avatar-wrapper">
         <img 
@@ -40,11 +41,15 @@ import { ref , watchEffect } from 'vue'
 import { getSuggestedFollowsApi, followUserApi } from '@/api/modules/user.api'
 import defaultAvatar from '@/assets/img/user_default.png'
 import ToastMessage from '@/components/ToastMessage.vue'
+import { useAppStore } from '@/stores/app.store'
+import { useRouter } from 'vue-router'
 
 
 const toastVisible = ref(false)
 const toastText = ref('')
 const isError = ref(false)
+const appStore = useAppStore()
+const router = useRouter()
 
 const experts = ref([])
 
@@ -74,6 +79,14 @@ const handleFollow = async (userId) => {
     toastText.value = "Đã theo dõi chuyên gia thành công!"  
     toastVisible.value = true
   }
+}
+
+const handleInfo = (id) => {
+  appStore.idProfile = id
+  router.push({ 
+      name: 'profile', 
+      query: { id: id } 
+  }) 
 }
 
 </script>
@@ -111,6 +124,7 @@ const handleFollow = async (userId) => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
 }
 
 .expert-avatar {

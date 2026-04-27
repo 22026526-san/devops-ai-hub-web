@@ -17,7 +17,7 @@
                         <div class="icon-btn bg-btn">
                             <div class="icon-20 icon-user"></div>
                         </div>
-                        <div class="item-content">
+                        <div class="item-content" @click="toProfile">
                             <span class="main-text">Trang cá nhân</span>
                         </div>
                         <div class="icon-btn">
@@ -89,13 +89,26 @@
 </template>
 <script setup>
 import { useAuthStore } from '@/stores/auth.store'
+import { useAppStore } from '@/stores/app.store'
 import defaultAvatar from '@/assets/img/user_default.png'
 import { USER_ROLES } from '@/common/enums'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const appStore = useAppStore()
+const router = useRouter()
 
 const handleLogout = () => {
     authStore.logout()
+}
+
+const toProfile = () => {
+    appStore.idProfile = authStore.user?.userId
+    appStore.setSettingMenu(false)
+    router.push({ 
+        name: 'profile', 
+        query: { id: authStore.user?.userId } 
+    }) 
 }
 
 </script>

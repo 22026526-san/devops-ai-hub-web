@@ -33,8 +33,8 @@ export const getUserProfileByIdApi = async (userId) => {
   return axiosInstance.get(`/users/${userId}/profile`)
 }
 
-export const getProfilesApi = async (params) => {
-  return axiosInstance.get('/users/profiles', { params })
+export const getProfilesApi = async () => {
+  return axiosInstance.get('/users/profiles')
 }
 
 export const getSuggestedFollowsApi = async (params) => {
