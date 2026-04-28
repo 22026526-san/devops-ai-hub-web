@@ -10,6 +10,8 @@ import SearchPage from '@/views/app/SearchPage.vue'
 import ProfileLayout from '@/layout/ProfileLayout.vue'
 import ProfilePage from '@/views/app/ProfilePage.vue'
 import { useAppStore } from '@/stores/app.store'
+import LikePostPage from '@/views/app/LikePostPage.vue'
+import BookmarkPostPage from '@/views/app/BookmarkPostPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +61,24 @@ const router = createRouter({
       path: '/search/:text?',
       name: 'search',
       component: SearchPage,
+      meta: { 
+        public: true ,
+        layout: HomeViewLayout
+      },
+    },
+    {
+      path: '/like_post',
+      name: 'like_post',
+      component: LikePostPage,
+      meta: { 
+        public: true ,
+        layout: HomeViewLayout
+      },
+    },
+    {
+      path: '/bookmark_post',
+      name: 'bookmark_post',
+      component: BookmarkPostPage,
       meta: { 
         public: true ,
         layout: HomeViewLayout
@@ -115,11 +135,6 @@ router.beforeEach(async (to, from) => {
         authStore.clearAuth()
         return '/login'
       }
-    }
-
-    if (to.path === '/home') {
-      appStore.setTopicSelected(1)
-      appStore.resetFilters()
     }
 
     return true

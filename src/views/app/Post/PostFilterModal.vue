@@ -59,9 +59,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive } from 'vue'
+import { computed } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useAppStore } from '@/stores/app.store'
+import { useRouter,useRoute } from 'vue-router'
 
 const props = defineProps({
   isOpen: Boolean
@@ -69,7 +70,19 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const appStore = useAppStore()
+const router = useRouter()
+const route = useRoute()
+
 const closeModal = () => {
+  router.replace({ 
+    query: { 
+      ...route.query, 
+      sort: appStore.filters.SortBy,
+      year:appStore.filters.Year  , 
+      month:appStore.filters.Month  , 
+      day:appStore.filters.Day   
+    } 
+  })
   emit('close')
 }
 const clearFilters = () => {

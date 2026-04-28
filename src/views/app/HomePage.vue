@@ -15,10 +15,11 @@ import CreatePost from '@/views/components/CreatePost.vue'
 import PostList from "@/views/app/Post/PostList.vue"
 import LoadingPage from '@/components/LoadingPage.vue'
 import { USER_ROLES } from '@/common/enums'
+import { useRoute } from 'vue-router'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
-
+const route = useRoute()
 
 const posts = ref([])
 const { filters } = appStore
@@ -29,6 +30,7 @@ const fetchPostsByTopic = async () => {
       filters.CurrentUserId = authStore.user?.userId
       const response = await getPostsApi(filters)
       posts.value = response.data
+      console.log(filters)
     } else {
       const response = await getPostsApi(filters)
       posts.value = response.data
@@ -42,12 +44,9 @@ const fetchPostsByTopic = async () => {
 }
 
 watch(
-  () => appStore.selectedTopic,
-
-  (newTopic) => {
-    if (newTopic) {
-      fetchPostsByTopic()
-    }
+  () => route.query,(newQuery) => {
+    appStore.syncUrlToState(newQuery, route.path)
+    fetchPostsByTopic()
   },
   {immediate:true}
 )

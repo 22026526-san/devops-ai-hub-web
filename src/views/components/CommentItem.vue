@@ -107,6 +107,7 @@ const handleOpenImage = (url) => {
 
 const handleInfo = (id) => {
     appStore.idProfile = id
+    appStore.fillTitle =''
     router.push({ 
         name: 'profile', 
         query: { id: id } 

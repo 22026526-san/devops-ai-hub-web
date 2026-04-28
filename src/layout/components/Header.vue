@@ -10,7 +10,7 @@
       <!-- Navigation Links -->
       <div class="nav-menu">
         <!-- Home (Active) -->
-        <router-link to="/home" class="nav-item" active-class="active" @click="toHomePage">
+        <router-link to="/home" class="nav-item" active-class="active">
           <div class="icon-20 icon-home"></div>
           Trang chủ
         </router-link>
@@ -72,6 +72,10 @@ const appStore = useAppStore()
 const hasUnreadNotifications = ref(true)
 
 const onSearchSubmit = () => {
+  appStore.fillTitle = 'liên quan'
+  const text = appStore.filters.Search;
+  appStore.resetFilters()
+  appStore.filters.Search = text
   router.push({ 
     name: 'search', 
     query: { text:appStore.filters.Search } 
@@ -80,11 +84,7 @@ const onSearchSubmit = () => {
 
 const onSearchClear = () => {
   appStore.filters.Search = null;
-}
-
-const toHomePage = () => {
-  appStore.setTopicSelected(1);
-  appStore.resetFilters();
+  appStore.fillTitle.fillTitle = '';
 }
 </script>
 

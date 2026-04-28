@@ -52,7 +52,7 @@
                         <div class="icon-btn bg-btn">
                             <div class="icon-20 icon-like"></div>
                         </div>
-                        <div class="item-content has-sub">
+                        <div class="item-content has-sub" @click="toLikePost">
                             <span class="main-text">Bài viết đã thích</span>
                         </div>
                         <div class="icon-btn">
@@ -64,7 +64,7 @@
                         <div class="icon-btn bg-btn">
                             <div class="icon-20 icon-save"></div>
                         </div>
-                        <div class="item-content">
+                        <div class="item-content" @click="toBookmarkPost">
                             <span class="main-text">Bài viết đã lưu</span>
                         </div>
                         <div class="icon-btn">
@@ -105,9 +105,27 @@ const handleLogout = () => {
 const toProfile = () => {
     appStore.idProfile = authStore.user?.userId
     appStore.setSettingMenu(false)
+    appStore.resetFilters();
+    appStore.fillTitle = ''
     router.push({ 
         name: 'profile', 
         query: { id: authStore.user?.userId } 
+    }) 
+}
+const toLikePost = () => {
+    appStore.setSettingMenu(false)
+    appStore.resetFilters()
+    appStore.fillTitle = 'đã thích'
+    router.push({ 
+        name: 'like_post', 
+    }) 
+}
+const toBookmarkPost = () => {
+    appStore.setSettingMenu(false)
+    appStore.resetFilters()
+    appStore.fillTitle = 'đã lưu'
+    router.push({ 
+        name: 'bookmark_post', 
     }) 
 }
 

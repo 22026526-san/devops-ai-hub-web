@@ -167,6 +167,7 @@ const handleToggleLike = async (post) => {
 }
 
 const handleInfo = (id) => {
+  appStore.fillTitle = ''
   appStore.idProfile = id
   router.push({ 
       name: 'profile', 

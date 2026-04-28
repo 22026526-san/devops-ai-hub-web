@@ -51,7 +51,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close','refreshComments'])
 const appStore = useAppStore()
-const newComment = reactive({
+let newComment = reactive({
     content: '',
     imageFile: null
 })

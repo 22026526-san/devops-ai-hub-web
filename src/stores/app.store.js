@@ -7,8 +7,8 @@ export const useAppStore = defineStore('app', {
     settingMenu: false,
     idProfile : 1,
     isFetchProfile:false,
-    isUnFollow:false,
     selectedTopic:1,
+    fillTitle:'',
     filters: {
       Search: null,
       TagIds: null,
@@ -24,6 +24,25 @@ export const useAppStore = defineStore('app', {
   }),
 
   actions: {
+
+    syncUrlToState(query, path) {
+      if (path !== '/profile') {
+        this.filters.FilterUserId =null
+      }
+      if (query.tagId) {
+        this.setTopicSelected(query.tagId)
+      } else {
+        this.setTopicSelected(1)
+      }
+
+      this.filters.Search = query.text ? query.text : null;
+    
+      this.filters.SortBy = query.sort ? query.sort :  null; 
+
+      this.filters.Year = query.year ? query.year: null;
+      this.filters.Month = query.month ? query.month : null;
+      this.filters.Day = query.day ? query.day : null;
+    },
     setAppLoading(value) {
       this.appLoading = value
     },

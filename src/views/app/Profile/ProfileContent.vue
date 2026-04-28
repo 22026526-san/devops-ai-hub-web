@@ -16,10 +16,12 @@ import {ref,watch} from 'vue'
 import { useAppStore } from '@/stores/app.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { getPostsApi } from '@/api/modules/app.api'
+import { useRoute } from 'vue-router';
 
 const appStore = useAppStore();
 const authStore = useAuthStore()
 const posts = ref([]);
+const route = useRoute()
 
 const fetchPostsInfor = async () => {
   appStore.setAppLoading(true)
@@ -37,14 +39,18 @@ const fetchPostsInfor = async () => {
 }
 
 watch(
-  () => [appStore.idProfile,appStore.isFetchProfile],
-
-  ([newTopic, isFetchProfile]) => {
-    if (newTopic || isFetchProfile) {
+  () => [appStore.idProfile, appStore.isFetchProfile, route.query],
+  ([newIdProfile, newIsFetchProfile, newQuery]) => {
+    
+    if (newQuery) {
+       appStore.syncUrlToState(newQuery, route.path)
+        fetchPostsInfor()
+    }
+    if (newIdProfile || newIsFetchProfile) {
       fetchPostsInfor()
     }
   },
-  {immediate:true}
+  {immediate: true}
 )
 
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="post-header-container">
-    <h2 class="post-title">Bài viết <span v-if="appStore.filters.Search">liên quan</span></h2>
+    <h2 class="post-title">Bài viết <span>{{ appStore.fillTitle }}</span></h2>
 
     <div class="post-actions">
       <button class="action-btn" @click="openFilter">
