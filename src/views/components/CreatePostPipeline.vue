@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted,computed } from 'vue';
+import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {
     X,
     Code2,
@@ -22,6 +22,14 @@ const authStore = useAuthStore()
 const topics = ref([]);
 const fileInputRef = ref(null);
 const selectedVisibility = ref(POST_VISIBILITY.PUBLIC);
+const isEditMode = computed(() => !!props.postData);
+
+const props = defineProps({
+    postData: {
+        type: Object,
+        default: null
+    }
+});
 
 const form = reactive({
     title: '',
@@ -32,7 +40,7 @@ const form = reactive({
     changelog: 'Initial version',
 });
 
-const emit = defineEmits(['close', 'refreshPosts']);
+const emit = defineEmits(['close', 'refreshPosts','submitEditPipeline',]);
 
 const showCodeEditor = ref(false);
 
@@ -134,6 +142,30 @@ const handleFileChange = (event) => {
     event.target.value = '';
 };
 
+const handleSubmitEdit = () => {
+    const formData = new FormData();
+
+    if (form.changelog) {
+        formData.append('Changelog', form.changelog);
+    }
+
+    formData.append('Title', form.title);
+    formData.append('Visibility', selectedVisibility.value);
+    
+    if (form.description) {
+        formData.append('PipelineDescription', form.description); 
+    }
+    if (form.content) {
+        formData.append('PipelineContent', form.content); 
+    }
+
+    form.tagIds.forEach((tagId, index) => {
+        formData.append(`TagIds[${index}]`, tagId);
+    });
+
+    emit('submitEditPipeline', formData);
+}
+
 const handleSubmit = async () => {
 
     try {
@@ -146,6 +178,32 @@ const handleSubmit = async () => {
         RefreshPosts();
     }
 }
+
+watch(
+    () => props.postData,
+    (newData) => {
+        if (newData) {
+            form.title = newData.title || '';
+            selectedVisibility.value = newData.visibility || POST_VISIBILITY.PUBLIC;
+            form.visibility = selectedVisibility.value;
+            
+            form.description = newData.detail?.description || '';
+            form.content = newData.detail?.pipelineContent || '';
+            
+            if (form.content) {
+                showCodeEditor.value = true;
+            }
+
+            if (newData.tags && Array.isArray(newData.tags)) {
+                form.tagIds = newData.tags.map(t => t.id);
+            } else {
+                form.tagIds = [];
+            }
+            console.log(newData)
+        }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
@@ -245,7 +303,11 @@ const handleSubmit = async () => {
                 </div>
 
                 <div class="submit-btn-wrapper">
-                    <button class="submit-btn" @click="handleSubmit">
+                    <button class="submit-btn" @click="handleSubmitEdit" v-if="isEditMode">
+                        <Save class="icon" />
+                        Lưu bài viết
+                    </button>
+                    <button class="submit-btn" @click="handleSubmit" v-else>
                         <Save class="icon" />
                         Tạo Bài Viết
                     </button>

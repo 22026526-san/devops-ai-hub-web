@@ -39,7 +39,7 @@ import PipelineCard from '@/views/components/PipelineCard.vue'
 import CommentItem from '@/views/components/CommentItem.vue'
 import CreateComment from '@/views/components/CreateComment.vue'
 import { useAppStore } from '@/stores/app.store'
-import { createCommentApi, replyCommentApi, updateCommentApi, deleteCommentApi, getPipelineVersionsApi } from '@/api/modules/app.api'
+import { createCommentApi, replyCommentApi, updateCommentApi, deleteCommentApi } from '@/api/modules/app.api'
 
 
 
@@ -55,16 +55,6 @@ let newComment = reactive({
     content: '',
     imageFile: null
 })
-const postVersionData = ref(null)
-
-const fetchPostVersion = async () => {
-    try {
-        const response = await getPipelineVersionsApi(props.post.id)
-        postVersionData.value = response.data
-    } catch (error) {
-        console.error('Error fetching post version:', error)
-    }
-}
 
 const closeModal = () => {
     emit('close')

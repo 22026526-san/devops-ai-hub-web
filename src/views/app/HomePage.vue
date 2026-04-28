@@ -30,7 +30,6 @@ const fetchPostsByTopic = async () => {
       filters.CurrentUserId = authStore.user?.userId
       const response = await getPostsApi(filters)
       posts.value = response.data
-      console.log(filters)
     } else {
       const response = await getPostsApi(filters)
       posts.value = response.data

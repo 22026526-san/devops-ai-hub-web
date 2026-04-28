@@ -28,6 +28,7 @@ export const useAppStore = defineStore('app', {
     syncUrlToState(query, path) {
       if (path !== '/profile') {
         this.filters.FilterUserId =null
+        this.idProfile = null
       }
       if (query.tagId) {
         this.setTopicSelected(query.tagId)

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted , computed} from 'vue';
+import { ref, reactive, onMounted , computed,watch} from 'vue';
 import {
     X,
     ChevronDown,
@@ -31,7 +31,40 @@ const form = reactive({
     Image: null,
 });
 
-const emit = defineEmits(['close', 'refreshPosts']);
+const props = defineProps({
+    postData: {
+        type: Object,
+        default: null 
+    }
+});
+
+const emit = defineEmits(['close', 'refreshPosts','submitEditQuestion']);
+
+const isEditMode = computed(() => !!props.postData);
+
+watch(
+    () => props.postData,
+    (newData) => {
+        if (newData) {
+            form.title = newData.title || '';
+            form.content = newData.detail?.content || ''; 
+            selectedVisibility.value = newData.visibility;
+            form.visibility = selectedVisibility.value;
+            
+            if (newData.tags && Array.isArray(newData.tags)) {
+                 form.tagIds = newData.tags.map(t => t.id);
+            } else {
+                 form.tagIds = [];
+            }
+
+            if (newData.detail?.imgUrl) {
+                previewImageUrl.value = newData.detail.imgUrl;
+                form.Image = newData.detail.imgUrl;
+            }
+        }
+    },
+    { immediate: true }
+);
 
 const showTagSelector = ref(true);
 
@@ -126,9 +159,7 @@ const handleSubmit = async () => {
     form.tagIds.forEach((tagId, index) => {
         formData.append(`TagIds[${index}]`, tagId); 
     });
-    if (form.Image) {
-        formData.append('Image', form.Image);
-    }
+    formData.append('Image', form.Image);
     try {
         await createQuestionPostApi(formData);
     } catch (error) {
@@ -138,6 +169,23 @@ const handleSubmit = async () => {
         RefreshPosts();
     }
 }
+const handleSubmitEdit = () => {
+    console.log(form)
+    const formData = new FormData();
+
+    formData.append('Title', form.title);
+    formData.append('QuestionContent', form.content); 
+    formData.append('Visibility', form.visibility);
+    
+    form.tagIds.forEach((tagId, index) => {
+        formData.append(`TagIds[${index}]`, tagId); 
+    });
+    
+    if (form.Image) {
+        formData.append('QuestionImage', form.Image); 
+    }
+    emit('submitEditQuestion', formData); 
+}
 </script>
 
 <template>
@@ -145,7 +193,7 @@ const handleSubmit = async () => {
         <div class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Tạo bài viết mới</h3>
+                    <h3>{{isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}}</h3>
                     <button class="close-btn" @click="closeModal" title="Đóng">
                         <X class="icon" />
                     </button>
@@ -232,7 +280,12 @@ const handleSubmit = async () => {
                 </div>
 
                 <div class="submit-btn-wrapper">
-                    <button class="submit-btn" @click="handleSubmit">
+
+                    <button class="submit-btn" @click="handleSubmitEdit" v-if="isEditMode">
+                        <Save class="icon" />
+                        Lưu bài viết
+                    </button>
+                    <button class="submit-btn" @click="handleSubmit" v-else>
                         <Save class="icon" />
                         Tạo Bài Viết
                     </button>

@@ -6,12 +6,14 @@
         v-if="item.postType === 'Pipeline'" 
         :post="item" 
         @openComment="handdleOpenModal"
+        @editPost="handdleOpenEdit"
       />
       
       <QuestionCard 
         v-else-if="item.postType === 'Question'" 
         :post="item" 
         @openComment="handdleOpenModal"
+        @editPost="handdleOpenEdit"
       />
       
       <div v-else class="fallback-card">
@@ -25,6 +27,13 @@
       :comments="apiCommentList"
       @close="handdleCloseModal"
       @refreshComments="handdleOpenModal(selectedPost.id)"
+    />
+
+    <EditPostModal 
+      :isOpen="isModalEditOpen" 
+      :post="selectedPostEdit"
+      @close="handdleCloseModalEdit"
+      @refreshComments="handdleCloseModalEdit"
     />
 
     <ToastMessage 
@@ -43,6 +52,7 @@ import QuestionCard from '@/views/components/QuestionCard.vue';
 import { getPostCommentsApi, getPostByIdApi } from '@/api/modules/app.api';
 import PostDetailModal from '@/views/app/Post/PostDetailModal.vue'
 import ToastMessage from '@/components/ToastMessage.vue';
+import EditPostModal from './EditPostModal.vue';
 
 defineProps({
   items: {
@@ -54,11 +64,13 @@ defineProps({
 const emit = defineEmits(['refreshPosts'])
 
 const isModalOpen = ref(false)
+const isModalEditOpen = ref(false)
 const apiCommentList = ref([])
 const toastVisible = ref(false)
 const toastText = ref('') 
 const isError = ref(false)
 const selectedPost = ref(null)
+const selectedPostEdit = ref(null)
 
 const handdleOpenModal = async (postid) => {
   try {
@@ -77,8 +89,17 @@ const handdleOpenModal = async (postid) => {
   }
 }
 
+const handdleOpenEdit= (postData) => {
+  selectedPostEdit.value = postData
+  isModalEditOpen.value = true
+}
+
 const handdleCloseModal = () => {
   isModalOpen.value = false
+  emit('refreshPosts')
+}
+const handdleCloseModalEdit = () => {
+  isModalEditOpen.value = false
   emit('refreshPosts')
 }
 </script>
