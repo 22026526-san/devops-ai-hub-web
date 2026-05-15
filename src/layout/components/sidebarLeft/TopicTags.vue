@@ -1,22 +1,28 @@
 <template>
   <div class="trending-card">
     <!-- Header -->
-    <div class="card-header">
-      <div class="icon-20 icon-topic-tags"></div>
-      <h3 class="title">Chủ đề</h3>
+    <div>
+      <div v-if="isSearching" class="search-wrapper" style="width: 100%; display: flex; align-items: center; gap: 8px;">
+        <BaseSearch v-model="searchTopic" placeholder="Tìm kiếm chủ đề..." style="flex: 1;" />
+      </div>
+      <div class="card-header" v-else>
+        <div style="display: flex;gap: 8px;">
+          <div class="icon-20 icon-topic-tags"></div>
+          <h3 class="title">Chủ đề</h3>
+        </div>
+        <div>
+          <div class="icon-20 icon-lock" @click="isSearching = true"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Danh sách Tags -->
     <div class="tag-list">
-      <li 
-        v-for="tag in topics" 
-        :key="tag.name" 
-        class="tag-item"
-        :class="{ 'is-active': appStore.filters.TagIds === tag.id }"
-        @click="handleClickTag(tag)"
-      >
+      <li v-for="tag in topics" :key="tag.name" class="tag-item"
+        :class="{ 'is-active': appStore.filters.TagIds === tag.id }" @click="handleClickTag(tag)">
         <div class="tag-left">
-          <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
             <line x1="4" y1="22" x2="4" y2="15"></line>
           </svg>
@@ -29,41 +35,59 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app.store'
 import { getTagsApi } from '@/api/modules/app.api'
 import { useRouter, useRoute } from 'vue-router'
+import BaseSearch from '@/components/base/BaseSearch.vue'
 
 const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 const topics = ref([]);
+const searchTopic = ref('');
+const isSearching = ref(false);
+const dataSearch = ref({
+  Search:null,
+  PageSize: 20,
+  Page:1
+})
 
 const fetchTopics = async () => {
-  appStore.setAppLoading(true)
   try {
-    const response = await getTagsApi()
-    topics.value = response.data
+    const response = await getTagsApi(dataSearch.value)
+    console.log(response)
+    topics.value = response.data.items
   } catch (error) {
     console.error('Lỗi khi tải topics:', error)
-} finally {
-    appStore.setAppLoading(false)
   }
 }
 
-onMounted(() => {
-  fetchTopics()
-})
+
+
+watch(searchTopic, (newVal) => {
+    dataSearch.value.Search = newVal
+    fetchTopics()
+},{immediate:true})
 
 const handleClickTag = (tag) => {
-  appStore.setTopicSelected(tag.id)
-  router.replace({ 
-    query: { 
-      ...route.query, 
-      tagId: tag.id   
-    } 
-  })
-}
+  const isCurrentlySelected = tag.id === appStore.filters.TagIds;
+  const nextTagId = isCurrentlySelected ? 1 : tag.id;
+
+  appStore.setTopicSelected(nextTagId);
+
+  const newQuery = { ...route.query };
+
+  if (nextTagId === 1) {
+    delete newQuery.tagId;
+  } else {
+    newQuery.tagId = nextTagId;
+  }
+  
+  router.replace({
+    query: newQuery
+  });
+};
 </script>
 
 <style scoped>
@@ -73,17 +97,17 @@ const handleClickTag = (tag) => {
   border-radius: 1rem;
   padding: 1.25rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  margin-bottom: 1.5rem; 
+  margin-bottom: 1.5rem;
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   margin-bottom: 1.25rem;
 }
 
-.icon-20 {
+.icon-topic-tags {
   background-color: #3b82f6;
 }
 
@@ -103,7 +127,7 @@ const handleClickTag = (tag) => {
   gap: 0.5rem;
   overflow-y: auto;
   max-height: 268px;
-  scrollbar-width: none; 
+  scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
@@ -148,7 +172,11 @@ const handleClickTag = (tag) => {
 }
 
 .tag-item.is-active {
-  background-color: #eff6ff; 
+  background-color: #eff6ff;
+}
+
+.search-wrapper, .card-header {
+  margin-bottom: 5px;
 }
 
 .tag-item.is-active .tag-icon,
@@ -161,5 +189,9 @@ const handleClickTag = (tag) => {
   background-color: #dbeafe;
   color: #2563eb;
   font-weight: 600;
+}
+
+.icon-lock {
+  cursor: pointer;
 }
 </style>

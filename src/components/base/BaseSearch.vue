@@ -6,15 +6,14 @@
     <input
       type="text"
       class="search-input"
-      :value="modelValue"
+      v-model="text"
       :placeholder="placeholder"
-      @input="handleInput"
       @keyup.enter="handleEnter"
       v-bind="$attrs"
     />
 
     <div 
-      v-if="modelValue" 
+      v-if="text" 
       class="btn-clear" 
       @click="handleClear"
       type="button"
@@ -41,13 +40,9 @@ const props = defineProps({
 
 const emit = defineEmits(['search', 'clear'])
 
-const handleInput = (event) => {
-  text.value = event.target.value
-}
-
 const handleEnter = () => {
   if (text.value.trim()) {
-    emit('search', text.value)
+    emit('search')
   }
 }
 
