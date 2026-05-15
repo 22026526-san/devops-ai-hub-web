@@ -13,19 +13,21 @@
         </div>
         <div class="post_time">{{ formatDateTime(post.createdAt) }}</div>
       </div>
-      <div class="post_options" v-if="post.authorId !== authStore.user?.userId">
-        <Bookmark :size="22" :color="post.isBookmarked ? '#dbea10' : '#65676b'" @click="handleToggleBookmark(post)" />
-      </div>
-      <div class="options_wrapper" v-if="post.authorId === authStore.user?.userId">
+  
+      <div class="options_wrapper">
         <Ellipsis :size="22" :color="'#65676b'" @click.stop="showOptions = !showOptions" />
         <div v-if="showOptions" class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleEditPost">
+          <div class="dropdown-item" @click.stop="handleEditPost" v-if="post.authorId === authStore.user?.userId">
             <Pen class="icon-sm" />
             Chỉnh sửa
           </div>
-          <div class="dropdown-item" @click.stop="handleDeletePost">
+          <div class="dropdown-item" @click.stop="handleDeletePost" v-if="post.authorId === authStore.user?.userId">
             <Trash2 class="icon-sm" />
             Xóa
+          </div>
+          <div class="dropdown-item delete-text" v-if="post.authorId !== authStore.user?.userId">
+            <Flag class="icon-sm" />
+            Báo cáo
           </div>
         </div>
       </div>
@@ -80,6 +82,10 @@
               <MessageSquare :size="20" />
               <span>{{ post.commentCount }}</span>
             </div>
+            <div class="action-btn" @click="handleToggleBookmark(post)"
+              v-if="post.authorId !== authStore.user?.userId">
+              <Bookmark :size="22" :color="post.isBookmarked ? '#dbea10' : '#65676b'" />
+            </div>
           </div>
         </div>
         <div class="metrics-right">
@@ -93,7 +99,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
-import { MessageSquare, ThumbsUp, Earth, Users, Bookmark, Lock, Ellipsis, Save, SquarePen, Trash2, Pen } from 'lucide-vue-next';
+import { MessageSquare, ThumbsUp, Earth, Users, Bookmark, Lock, Ellipsis, Save, SquarePen, Trash2, Pen,Flag } from 'lucide-vue-next';
 import defaultAvatar from '@/assets/img/user_default.png'
 import { POST_VISIBILITY } from '@/common/enums';
 import { bookmarkPostApi, unbookmarkPostApi, likePostApi, unlikePostApi, getPipelineVersionsApi,getPipelineVersionByIdApi } from '@/api/modules/app.api';

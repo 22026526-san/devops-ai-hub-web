@@ -179,7 +179,9 @@ const handleInfo = (id) => {
   cursor: pointer;
   border: none;
 }
-
+.icon-lock{
+  cursor: pointer;
+}
 .btn-follow .icon-20 {
   background-color: #2563eb;
 }

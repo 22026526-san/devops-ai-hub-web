@@ -2,7 +2,7 @@
   <div class="trending-card" @click.self="isSearching = false">
     <!-- Header -->
     <div>
-      <div v-if="isSearching" class="search-wrapper" style="width: 100%; display: flex; align-items: center; gap: 8px;">
+      <div v-if="isSearching" class="search-wrapper" style="display: flex; align-items: center; gap: 8px;">
         <BaseSearch v-model="searchTopic" placeholder="Tìm kiếm chủ đề..." style="flex: 1;" />
       </div>
       <div class="card-header" v-else>

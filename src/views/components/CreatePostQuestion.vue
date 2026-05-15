@@ -85,7 +85,7 @@ const fetchTopics = async () => {
     appStore.setAppLoading(true)
     try {
         const response = await getTagsApi()
-        topics.value = response.data
+        topics.value = response.data.items
         console.log('Tags đã tải về:', topics.value)
     } catch (error) {
         console.error('Lỗi khi tải topics:', error)
