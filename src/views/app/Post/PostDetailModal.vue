@@ -125,7 +125,6 @@ const handleEditComment = async (commentEdit) => {
      }
 }
 
-
 const handleDeleteComment = async (commentId) => {
     appStore.setAppLoading(true)
     try {
@@ -137,13 +136,6 @@ const handleDeleteComment = async (commentId) => {
         appStore.setAppLoading(false)
     }
 }
-watch(() => props.isOpen, (newVal) => {
-    if (newVal === true && props.post?.postType === 'Pipeline') {
-        fetchPostVersion()
-    } else {
-        postVersionData.value = null
-    }
-})
 </script>
 
 <style scoped>

@@ -1,54 +1,86 @@
 <template>
-  <CreatePost @refreshPosts="fetchPostsByTopic"/>
-  <div class="post_list_container">
-    <PostList :items="posts.items" @refreshPosts="fetchPostsByTopic"/>
+  <CreatePost @refreshPosts="fetchPostsByTopic" />
+  <div  ref="postListContainerRef">
+    <PostList :items="posts" @refreshPosts="fetchPostsByTopic" />
   </div>
-  <LoadingPage v-if="appStore.appLoading"/>
 </template>
 
 <script setup>
-import { watch, ref} from 'vue'
+import { watch, ref, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/app.store'
-import {useAuthStore} from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { getPostsApi } from '@/api/modules/app.api'
 import CreatePost from '@/views/components/CreatePost.vue'
 import PostList from "@/views/app/Post/PostList.vue"
-import LoadingPage from '@/components/LoadingPage.vue'
 import { USER_ROLES } from '@/common/enums'
 import { useRoute } from 'vue-router'
+import { useInfiniteScroll } from '@vueuse/core'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const route = useRoute()
+const loading = ref(false)
+const hasMore = ref(true)
+const postListContainerRef = ref(null)
 
 const posts = ref([])
 const { filters } = appStore
+
 const fetchPostsByTopic = async () => {
-  appStore.setAppLoading(true)
+  if (loading.value || !hasMore.value) return
+  loading.value = true
   try {
     if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
       filters.CurrentUserId = authStore.user?.userId
       const response = await getPostsApi(filters)
-      posts.value = response.data
+      posts.value = [...posts.value, ...response.data.items]
+      if (!response.data.hasNextPage) {
+        hasMore.value = false
+      } else {
+        appStore.filters.Page++
+      }
     } else {
       const response = await getPostsApi(filters)
-      posts.value = response.data
+      posts.value = [...posts.value, ...response.data.items]
+      if (!response.data.hasNextPage) {
+        hasMore.value = false
+      } else {
+        appStore.filters.Page++
+      }
     }
-
   } catch (error) {
     console.error('Lỗi khi tải bài viết:', error)
-  } finally {
-    appStore.setAppLoading(false)
+  } finally{
+    loading.value=false
   }
 }
 
-watch(
-  () => route.query,(newQuery) => {
-    appStore.syncUrlToState(newQuery, route.path)
-    fetchPostsByTopic()
+const resetAndFetch = async () => {
+  posts.value = []
+  appStore.filters.Page = 1
+  hasMore.value = true
+  await fetchPostsByTopic()
+}
+
+useInfiniteScroll(
+  postListContainerRef,
+  () => {
+    if (!loading.value && hasMore.value) {
+      fetchPostsByTopic()
+    }
   },
-  {immediate:true}
+  { distance: 50 } 
 )
+
+watch(
+  () => route.query,async (newQuery) => {
+    appStore.syncUrlToState(newQuery, route.path)
+    await resetAndFetch()
+  },
+  { immediate: true }
+)
+
+
 
 
 </script>
