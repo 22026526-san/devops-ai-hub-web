@@ -57,7 +57,7 @@
             <div @click="handleSaveCode" v-if="isSaveCode" class="action-icon">
               <Save :size="24" />
             </div>
-            <div @click="handleEditCode" v-if="authStore.user.userId === appStore.idProfile && !isSaveCode"
+            <div @click="handleEditCode" v-if="authStore.user?.userId === appStore.idProfile && !isSaveCode"
               class="action-icon">
               <SquarePen :size="24" />
             </div>

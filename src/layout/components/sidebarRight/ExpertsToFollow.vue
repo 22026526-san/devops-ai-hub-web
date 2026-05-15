@@ -98,6 +98,7 @@ const handleFollow = async (userId) => {
 }
 
 const handleInfo = (id) => {
+  appStore.filters.Page=1
   appStore.idProfile = id
   appStore.fillTitle = ''
   router.push({

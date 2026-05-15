@@ -103,6 +103,7 @@ const handleLogout = () => {
 }
 
 const toProfile = () => {
+    appStore.filters.Page=1
     appStore.idProfile = authStore.user?.userId
     appStore.setSettingMenu(false)
     appStore.resetFilters();
@@ -113,6 +114,7 @@ const toProfile = () => {
     }) 
 }
 const toLikePost = () => {
+    appStore.filters.Page=1
     appStore.setSettingMenu(false)
     appStore.resetFilters()
     appStore.fillTitle = 'đã thích'
@@ -121,6 +123,7 @@ const toLikePost = () => {
     }) 
 }
 const toBookmarkPost = () => {
+    appStore.filters.Page=1
     appStore.setSettingMenu(false)
     appStore.resetFilters()
     appStore.fillTitle = 'đã lưu'

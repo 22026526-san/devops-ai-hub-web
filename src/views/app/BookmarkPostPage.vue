@@ -1,7 +1,7 @@
 <template>
   <FillterPost @refreshPosts="fetchBookmarkPosts" />
-  <div class="post_list_container">
-    <PostList :items="posts.items" @refreshPosts="fetchBookmarkPosts" />
+  <div ref="postListContainerRef">
+    <PostList :items="posts" @refreshPosts="fetchBookmarkPosts" />
   </div>
   <LoadingPage v-if="appStore.appLoading" />
 </template>
@@ -14,29 +14,55 @@ import PostList from "@/views/app/Post/PostList.vue"
 import LoadingPage from '@/components/LoadingPage.vue'
 import FillterPost from '@/views/components/FillterPost.vue'
 import { useRoute } from 'vue-router'
+import { useInfiniteScroll } from '@vueuse/core'
 
 const appStore = useAppStore()
 const posts = ref([])
 const route = useRoute()
+const hasMore = ref(true)
+const postListContainerRef = ref(null)
+const loading = ref(false)
 
 const fetchBookmarkPosts = async () => {
-  appStore.setAppLoading(true)
+  if (loading.value || !hasMore.value) return
+  loading.value=true
 
   try {
       const response = await getMyBookmarksApi(appStore.filters)
-      posts.value = response.data
+      posts.value = [...posts.value, ...response.data.items]
+      if (!response.data.hasNextPage) {
+        hasMore.value = false
+      } else {
+        appStore.filters.Page++
+      }
   } catch (error) {
     console.error('Lỗi khi tải bài viết:', error)
   } finally {
-    appStore.setAppLoading(false)
+   loading.value=false
   }
 }
+const resetAndFetch = async () => {
+  posts.value = []
+  appStore.filters.Page = 1
+  hasMore.value = true
+  await fetchBookmarkPosts()
+}
+
+useInfiniteScroll(
+  postListContainerRef,
+  () => {
+    if (!loading.value && hasMore.value) {
+      fetchBookmarkPosts()
+    }
+  },
+  { distance: 50 } 
+)
 
 watch(
   () => route.query,
-  (newQuery) => {
+  async (newQuery) => {
     appStore.syncUrlToState(newQuery, route.path)
-    fetchBookmarkPosts()
+    await resetAndFetch()
   },
   { immediate: true }
 )

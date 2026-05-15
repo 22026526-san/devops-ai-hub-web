@@ -1,7 +1,7 @@
 <template>
   <FillterPost @refreshPosts="fetchPostsByTopic" />
-  <div class="post_list_container">
-    <PostList :items="posts.items" @refreshPosts="fetchPostsByTopic" />
+  <div ref="postListContainerRef">
+    <PostList :items="posts" @refreshPosts="fetchPostsByTopic" />
   </div>
   <LoadingPage v-if="appStore.appLoading" />
 </template>
@@ -16,20 +16,30 @@ import LoadingPage from '@/components/LoadingPage.vue'
 import { USER_ROLES } from '@/common/enums'
 import FillterPost from '@/views/components/FillterPost.vue'
 import { useRoute } from 'vue-router'
+import { useInfiniteScroll } from '@vueuse/core'
 
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const route = useRoute()
+const hasMore = ref(true)
+const postListContainerRef = ref(null)
+const loading = ref(false)
 
 const posts = ref([])
 
 const fetchPostsByTopic = async () => {
-
+  if (loading.value || !hasMore.value) return
+  loading.value=true
   try {
     if (authStore.role === USER_ROLES.ADMIN || authStore.role === USER_ROLES.USER) {
       appStore.filters.CurrentUserId = authStore.user.userId
       const response = await getPostsApi(appStore.filters)
-      posts.value = response.data
+      posts.value = [...posts.value, ...response.data.items]
+      if (!response.data.hasNextPage) {
+        hasMore.value = false
+      } else {
+        appStore.filters.Page++
+      }
       console.log("fetchPostsByTopic with CurrentUserId:", appStore.filters)
     } else {
       const response = await getPostsApi(appStore.filters)
@@ -38,14 +48,31 @@ const fetchPostsByTopic = async () => {
 
   } catch (error) {
     console.error('Lỗi khi tải bài viết:', error)
-  } 
+  } finally {
+    loading.value=false
+  }
+}
+const resetAndFetch = async () => {
+  posts.value = []
+  appStore.filters.Page = 1
+  hasMore.value = true
+  await fetchPostsByTopic()
 }
 
+useInfiniteScroll(
+  postListContainerRef,
+  () => {
+    if (!loading.value && hasMore.value) {
+      fetchPostsByTopic()
+    }
+  },
+  { distance: 50 } 
+)
 watch(
   () =>  route.query,
-  (newQuery) => {
+  async (newQuery) => {
     appStore.syncUrlToState(newQuery, route.path)
-    fetchPostsByTopic()
+    await resetAndFetch()
   },
   { immediate: true }
 )
