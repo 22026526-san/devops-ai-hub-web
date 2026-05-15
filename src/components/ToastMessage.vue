@@ -51,7 +51,7 @@ const statusClass = computed(() => ({
   position: fixed;
   top: 24px;
   right: 24px;
-  z-index: 9999;
+  z-index: 9999999;
   display: flex;
   align-items: center;
   padding: 12px 20px;
