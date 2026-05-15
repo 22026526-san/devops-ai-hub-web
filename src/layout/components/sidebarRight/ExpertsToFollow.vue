@@ -1,48 +1,42 @@
 <template>
-  <div class="experts-card">
-    <h3 class="card-title">Gợi ý theo dõi</h3>
-    
+  <div class="experts-card" @click.self="isSearching=false">
+    <div v-if="!isSearching" style="display: flex;justify-content: space-between;margin-bottom: 10px;">
+      <h3 class="card-title">Gợi ý theo dõi</h3>
+      <div class="icon-20 icon-lock" @click="isSearching = true"></div>
+    </div>
+
+    <div v-else style="width: 100%; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+      <BaseSearch v-model="searchUsers" placeholder="Tìm kiếm chủ đề..." style="flex: 1;" />
+    </div>
+
     <div class="expert-list">
-      <div 
-        v-for="expert in experts" 
-        :key="expert.userId" 
-        class="expert-item"
-        @click="handleInfo(expert.userId)"
-      >
+      <div v-for="expert in experts" :key="expert.userId" class="expert-item" @click="handleInfo(expert.userId)">
         <div class="user-avatar-wrapper">
-        <img 
-          :src="expert.avatarUrl ? expert.avatarUrl : defaultAvatar" 
-          alt="User Avatar" 
-          class="user-avatar"
-        />
-      </div>
-        
+          <img :src="expert.avatarUrl ? expert.avatarUrl : defaultAvatar" alt="User Avatar" class="user-avatar" />
+        </div>
+
         <div class="expert-info">
           <span class="expert-name">{{ expert.fullName }}</span>
           <span class="expert-role">{{ expert.jobTitle ? expert.jobTitle : '' }}</span>
         </div>
-        
-        <button class="btn-follow" @click="handleFollow(expert.userId)">
+
+        <div class="btn-follow" @click="handleFollow(expert.userId)">
           <div class="icon-20 icon-plus"></div>
-        </button>
+        </div>
       </div>
     </div>
   </div>
-  <ToastMessage 
-    v-model="toastVisible"
-    :text="toastText"
-    :is-success="!isError"
-    :is-error="isError"
-  />
+  <ToastMessage v-model="toastVisible" :text="toastText" :is-success="!isError" :is-error="isError" />
 </template>
 
 <script setup>
-import { ref , watchEffect } from 'vue'
-import { getSuggestedFollowsApi, followUserApi } from '@/api/modules/user.api'
+import { ref,watch } from 'vue'
+import { getSuggestedFollowsApi, followUserApi ,getProfilesApi} from '@/api/modules/user.api'
 import defaultAvatar from '@/assets/img/user_default.png'
 import ToastMessage from '@/components/ToastMessage.vue'
 import { useAppStore } from '@/stores/app.store'
 import { useRouter } from 'vue-router'
+import BaseSearch from '@/components/base/BaseSearch.vue'
 
 
 const toastVisible = ref(false)
@@ -50,6 +44,13 @@ const toastText = ref('')
 const isError = ref(false)
 const appStore = useAppStore()
 const router = useRouter()
+const isSearching = ref(false)
+const searchUsers = ref('')
+const dataSearch = ref({
+  Search:null,
+  PageSize: 20,
+  Page:1
+})
 
 const experts = ref([])
 
@@ -62,9 +63,24 @@ const loadSuggestedFollows = async () => {
   }
 }
 
-watchEffect(() => {
-  loadSuggestedFollows()
-})
+const fetchUsers = async () => {
+  try {
+    const response = await getProfilesApi(dataSearch.value)
+    experts.value = response.data.items
+  } catch (error) {
+    console.error('Lỗi khi tải topics:', error)
+  }
+}
+
+watch(searchUsers, (newVal) => {
+    if (newVal && newVal.trim() !== '') {
+    dataSearch.value.Search = newVal.trim()
+    fetchUsers()
+  } else {
+    dataSearch.value.Search = null
+    loadSuggestedFollows()
+  }
+},{immediate:true})
 
 const handleFollow = async (userId) => {
   try {
@@ -76,7 +92,7 @@ const handleFollow = async (userId) => {
   } finally {
     loadSuggestedFollows()
     isError.value = false
-    toastText.value = "Đã theo dõi chuyên gia thành công!"  
+    toastText.value = "Đã theo dõi chuyên gia thành công!"
     toastVisible.value = true
   }
 }
@@ -84,10 +100,10 @@ const handleFollow = async (userId) => {
 const handleInfo = (id) => {
   appStore.idProfile = id
   appStore.fillTitle = ''
-  router.push({ 
-      name: 'profile', 
-      query: { id: id } 
-  }) 
+  router.push({
+    name: 'profile',
+    query: { id: id }
+  })
 }
 
 </script>
@@ -117,7 +133,7 @@ const handleInfo = (id) => {
   gap: 0.5rem;
   overflow-y: auto;
   max-height: 368px;
-  scrollbar-width: none; 
+  scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
@@ -129,27 +145,27 @@ const handleInfo = (id) => {
 }
 
 .expert-avatar {
-  width: 38px; 
+  width: 38px;
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #e2e8f0; 
+  background-color: #e2e8f0;
 }
 
 .expert-info {
-  flex: 1; 
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .expert-name {
-  font-size: 14px ;
+  font-size: 14px;
   font-weight: 600;
   color: #0f172a;
 }
 
 .expert-role {
-  font-size:  12px;
+  font-size: 12px;
   color: #64748b;
   margin-top: 0.1rem;
 }
@@ -157,13 +173,14 @@ const handleInfo = (id) => {
 .btn-follow {
   display: flex;
   align-items: center;
-  justify-self:center;
+  justify-self: center;
   gap: 2px;
   background-color: transparent;
   cursor: pointer;
   border: none;
 }
+
 .btn-follow .icon-20 {
-  background-color: #2563eb; 
+  background-color: #2563eb;
 }
 </style>

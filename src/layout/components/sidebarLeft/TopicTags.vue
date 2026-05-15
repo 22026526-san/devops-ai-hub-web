@@ -1,5 +1,5 @@
 <template>
-  <div class="trending-card">
+  <div class="trending-card" @click.self="isSearching = false">
     <!-- Header -->
     <div>
       <div v-if="isSearching" class="search-wrapper" style="width: 100%; display: flex; align-items: center; gap: 8px;">
@@ -56,7 +56,6 @@ const dataSearch = ref({
 const fetchTopics = async () => {
   try {
     const response = await getTagsApi(dataSearch.value)
-    console.log(response)
     topics.value = response.data.items
   } catch (error) {
     console.error('Lỗi khi tải topics:', error)

@@ -15,12 +15,6 @@
           Trang chủ
         </router-link>
 
-        <!-- Explore -->
-        <router-link to="/explore" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
-          <div class="icon-20 icon-explore"></div>
-          Khám phá
-        </router-link>
-
         <!-- AI Agent -->
         <router-link to="/ai-agent" class="nav-item" active-class="active" @click="appStore.setTopicSelected(1)">
           <div class="icon-20 icon-ai"></div>
