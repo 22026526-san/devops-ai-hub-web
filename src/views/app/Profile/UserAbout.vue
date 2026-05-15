@@ -6,7 +6,7 @@
       <div class="info-item">
         <IdCard class="info-icon" />
         <div class="info-text">
-          <strong>Trang cá nhân</strong> Người sáng tạo nội dung 
+          <strong>Trang cá nhân</strong> Người sáng tạo nội dung
         </div>
       </div>
 
@@ -18,7 +18,7 @@
       </div>
       <div class="info-item">
         <BriefcaseBusiness class="info-icon" />
-        <div class="info-text" v-if="data.jobTitle !== 'string'">
+        <div class="info-text" v-if="data.jobTitle !== 'string' && data.jobTitle !== null">
           Công việc <strong>{{ data.jobTitle }}</strong>
         </div>
         <div class="info-text" v-else>
@@ -28,7 +28,7 @@
 
       <div class="info-item">
         <GitPullRequestArrow class="info-icon" />
-        <div class="info-text" v-if="data.githubUrl !== 'string'">
+        <div class="info-text" v-if="data.githubUrl !== 'string' && data.githubUrl !== null">
           GitHub <strong><a :href="data.githubUrl" class="social-link">{{ data.githubUrl }}</a></strong>
         </div>
         <div class="info-text" v-else>
@@ -38,7 +38,7 @@
 
       <div class="info-item">
         <Link class="info-icon" />
-        <div class="info-text" v-if="data.bio !== 'string'">
+        <div class="info-text" v-if="data.bio !== 'string' && data.bio !== null">
           Bio <strong><a :href="data.bio" class="social-link">{{ data.bio }}</a></strong>
         </div>
         <div class="info-text" v-else>
@@ -54,48 +54,67 @@
       </div>
     </div>
 
-    <button class="btn-full">Chỉnh sửa chi tiết</button>
+    <button class="btn-full" @click="isModalOpen = true">Chỉnh sửa chi tiết</button>
+
+    <EditProfileModal v-model:isOpen="isModalOpen" :userData="data" @save="updateProfileInfo" />
+    <ConfirmModal />
   </div>
 </template>
 
 <script setup>
-import { 
-  IdCard, 
-  Mail, 
-  GitPullRequestArrow, 
-  Link, 
-  Clock, 
+import {
+  IdCard,
+  Mail,
+  GitPullRequestArrow,
+  Link,
+  Clock,
   BriefcaseBusiness
 } from 'lucide-vue-next';
 import { useAppStore } from '@/stores/app.store';
-import { useAuthStore } from '@/stores/auth.store';
-import { ref,watch } from 'vue';
-import { getUserProfileByIdApi } from '@/api/modules/user.api'
+import { useConfirmStore } from '@/stores/confim.store';
+import { ref, watch } from 'vue';
+import { getUserProfileByIdApi, updateProfileApi } from '@/api/modules/user.api'
 import { formatDate } from '@/utils/format'
+import EditProfileModal from '@/views/app/Profile/EditProfileModal.vue';
+import ConfirmModal from '@/views/components/ConfirmModal.vue';
 
 const appStore = useAppStore();
-const authStore = useAuthStore();
+const confirmStore = useConfirmStore();
 const data = ref([]);
+const isModalOpen = ref(false);
+
+const updateProfileInfo = async (newData) => {
+  const isConfirmed = await confirmStore.show(
+    "Cập nhật thông tin?",
+    "Bạn có chắc chắn muốn lưu những thay đổi này? Thông tin mới sẽ được hiển thị trên trang cá nhân của bạn."
+  );
+  if (!isConfirmed) return;
+  try {
+    await updateProfileApi(newData)
+  } catch (error) {
+    console.error("Lỗi cập nhật hồ sơ:", error);
+  } finally {
+    appStore.isUpdateProfile = true
+  }
+};
 
 const fetchInfoUser = async () => {
-    if (appStore.idProfile !== authStore.user?.userId) {
-        appStore.setAppLoading(true)
-        try {
-            const response = await getUserProfileByIdApi(appStore.idProfile)
-            data.value = response.data
-        } catch (error) {
-            console.error('Lỗi khi tải dữ liệu hồ sơ:', error)
-        } finally {
-            appStore.setAppLoading(false)
-        }
-    } else {
-        data.value = authStore.user
-    }
+  appStore.setAppLoading(true)
+  try {
+    const response = await getUserProfileByIdApi(appStore.idProfile)
+    data.value = response.data
+  } catch (error) {
+    console.error('Lỗi khi tải dữ liệu hồ sơ:', error)
+  } finally {
+    appStore.setAppLoading(false)
+    appStore.isUpdateProfile = false
+  }
 }
 
-watch(() => appStore.idProfile,
-  (newId) => {
-    if (newId) {
+watch(
+  () => [appStore.idProfile, appStore.isUpdateProfile],
+  ([newIdProfile, newUpdateProfile]) => {
+    if (newIdProfile || newUpdateProfile) {
       fetchInfoUser()
     }
   },
@@ -104,7 +123,6 @@ watch(() => appStore.idProfile,
 </script>
 
 <style scoped>
-
 .about-card {
   background-color: #ffffff;
   border-radius: 8px;
@@ -113,7 +131,7 @@ watch(() => appStore.idProfile,
   width: auto;
   max-width: 368px;
   color: #050505;
-  border: 1px solid #e0e0e0; 
+  border: 1px solid #e0e0e0;
   margin-bottom: 16px;
   height: auto;
 }

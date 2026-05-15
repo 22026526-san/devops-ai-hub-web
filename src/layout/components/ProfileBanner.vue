@@ -18,18 +18,21 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-secondary" v-if="appStore.idProfile === authStore.user?.userId">
-              <Pen class="icon-sm" />
-              Chỉnh sửa
-            </button>
-            <button class="btn btn-secondary" v-if="data.isFollowing && appStore.idProfile !== authStore.user?.userId" @click="handleUnFollow(appStore.idProfile)">
-              <X class="icon-sm" />
-                Hủy theo dõi
-            </button>
-            <button class="btn btn-secondary" v-if="!data.isFollowing && appStore.idProfile !== authStore.user?.userId" @click="handleFollow(appStore.idProfile)">
-              <Plus class="icon-sm" />
-              Theo dõi
-            </button>
+          <button class="btn btn-secondary" v-if="appStore.idProfile === authStore.user?.userId"
+            @click="isEditModalOpen = true">
+            <Pen class="icon-sm" />
+            Chỉnh sửa
+          </button>
+          <button class="btn btn-secondary" v-if="data.isFollowing && appStore.idProfile !== authStore.user?.userId"
+            @click="handleUnFollow(appStore.idProfile)">
+            <X class="icon-sm" />
+            Hủy theo dõi
+          </button>
+          <button class="btn btn-secondary" v-if="!data.isFollowing && appStore.idProfile !== authStore.user?.userId"
+            @click="handleFollow(appStore.idProfile)">
+            <Plus class="icon-sm" />
+            Theo dõi
+          </button>
         </div>
       </div>
 
@@ -42,25 +45,23 @@
           <div class="tab">Đang theo dõi</div>
         </div>
         <button class="btn-more">
-          <MoreHorizontal class="icon-sm" />
+          <MoreHorizontal class="icon-sm"/>
         </button>
       </div>
     </div>
-    <ToastMessage 
-        v-model="toastVisible"
-        :text="toastText"
-        :is-success="!isError"
-        :is-error="isError"
-    />
+    <ToastMessage v-model="toastVisible" :text="toastText" :is-success="!isError" :is-error="isError" />
+    <OtpModal v-model:isOpen="isOpen" @confirm="handleVerifyOtp" @resend="handleResendCode" />
+    <EditMainProfileModal v-model:isOpen="isEditModalOpen" :userData="data" @save="handleUpdateProfile" />
+    <ToastMessage v-model="toastVisible" :text="toastText" :is-success="!isError" :is-error="isError" />
   </div>
 </template>
 
 <script setup>
-import { 
-  Pen, 
-  Plus, 
-  MoreHorizontal, 
-  X
+import {
+  Pen,
+  Plus,
+  MoreHorizontal,
+  X,
 } from 'lucide-vue-next';
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
@@ -68,7 +69,9 @@ import { getUserProfileByIdApi } from '@/api/modules/user.api'
 import defaultAvatar from '@/assets/img/user_default.png'
 import { ref, watch } from 'vue';
 import ToastMessage from '@/components/ToastMessage.vue';
-import { followUserApi, unfollowUserApi } from '@/api/modules/user.api';
+import OtpModal from '@/components/OtpModal.vue';
+import EditMainProfileModal from '@/views/app/Profile/EditMainProfileModal.vue';
+import { followUserApi, unfollowUserApi, requestUpdateUserOtpApi,verifyUpdateUserOtpApi } from '@/api/modules/user.api';
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -76,66 +79,124 @@ const data = ref([])
 const toastVisible = ref(false)
 const toastText = ref('')
 const isError = ref(false)
+const isOpen = ref(false)
+const isEditModalOpen = ref(false)
+const formData = ref({})
 
 const fetchProfileData = async () => {
-  if (appStore.idProfile !== authStore.user?.userId) {
-    appStore.setAppLoading(true)
-    try {
-        const response = await getUserProfileByIdApi(appStore.idProfile)
-        data.value = response.data
-    } catch (error) {
-        console.error('Lỗi khi tải dữ liệu hồ sơ:', error)
-    } finally {
-        appStore.setAppLoading(false)
-    }
-  } else {
-    data.value = authStore.user
+  appStore.setAppLoading(true)
+  try {
+    const response = await getUserProfileByIdApi(appStore.idProfile)
+    data.value = response.data
+  } catch (error) {
+    console.error('Lỗi khi tải dữ liệu hồ sơ:', error)
+  } finally {
+    appStore.setAppLoading(false)
+    appStore.isUpdateProfile = false
   }
 }
 
-watch(() => appStore.idProfile,
-  (newId) => {
-    if (newId) {
+watch(
+  () => [appStore.idProfile, appStore.isUpdateProfile],
+  ([newIdProfile, newUpdateProfile]) => {
+    if (newIdProfile || newUpdateProfile) {
       fetchProfileData()
     }
   },
   { immediate: true }
 )
-
-const handleFollow = async (id) =>{
-    try {
-        await followUserApi(id)
-    } catch (error) {
-        isError.value = true
-        toastText.value = "Lỗi khi theo dõi chuyên gia: " + error.message
-        toastVisible.value = true
-    } finally {
-        fetchProfileData()
-        appStore.isFetchProfile = true,
-        isError.value = false
-        toastText.value = "Đã theo dõi chuyên gia thành công"  
-        toastVisible.value = true
-    }
+const handleFollow = async (id) => {
+  try {
+    await followUserApi(id)
+  } catch (error) {
+    isError.value = true
+    toastText.value = "Lỗi khi theo dõi chuyên gia: " + error.message
+    toastVisible.value = true
+  } finally {
+    fetchProfileData()
+    appStore.isFetchProfile = true,
+      isError.value = false
+    toastText.value = "Đã theo dõi chuyên gia thành công"
+    toastVisible.value = true
+  }
 }
-const handleUnFollow = async (id) =>{
-    try {
-        await unfollowUserApi(id)
-    } catch (error) {
-        isError.value = true
-        toastText.value = "Lỗi khi thủy heo dõi chuyên gia: " + error.message
-        toastVisible.value = true
-    } finally {
-        fetchProfileData()
-        appStore.isFetchProfile = true,
-        isError.value = false
-        toastText.value = "Hủy theo dõi chuyên gia thành công"  
-        toastVisible.value = true
-    }
+const handleUnFollow = async (id) => {
+  try {
+    await unfollowUserApi(id)
+  } catch (error) {
+    isError.value = true
+    toastText.value = "Lỗi khi thủy heo dõi chuyên gia: " + error.message
+    toastVisible.value = true
+  } finally {
+    fetchProfileData()
+    appStore.isFetchProfile = true,
+      isError.value = false
+    toastText.value = "Hủy theo dõi chuyên gia thành công"
+    toastVisible.value = true
+  }
+}
+const handleResendCode = async () => {
+  
+  try {
+    const result = await requestUpdateUserOtpApi({ oldEmail: data.email });
+  } catch (error) {
+    toastText.value = error;
+    isError.value = true;
+    toastVisible.value = true;
+  } finally {
+    toastText.value = 'Mã OTP đã được gửi đến mail của bạn';
+    isError.value = false;
+    toastVisible.value = true;
+  }
+}
+const handleUpdateProfile = async (data) => {
+  console.log(data.value)
+  if (!data.value.username || !data.value.email || !data.value.password) {
+    toastText.value = 'Vui lòng điền đầy đủ tất cả các trường.';
+    isError.value = true;
+    toastVisible.value = true;
+    return
+  }
+
+  formData.value = { ...data.value, otp: null }
+
+  try {
+    const result = await requestUpdateUserOtpApi({ oldEmail: data.value.email });
+  } catch (error) {
+    toastText.value = error;
+    isError.value = true;
+    toastVisible.value = true;
+    console.error('Yêu cầu thất bại:', error);
+  } finally {
+    toastText.value = 'Mã OTP đã được gửi đến mail của bạn';
+    isError.value = false;
+    toastVisible.value = true;
+    setTimeout(() => {
+      isOpen.value = true;
+    }, 1500);
+  }
+}
+const handleVerifyOtp = async (otpCode) => {
+  formData.value.otp = otpCode
+
+  try {
+    const result = await verifyUpdateUserOtpApi(formData.value);
+  } catch (error) {
+    toastText.value = error;
+    isError.value = true;
+    toastVisible.value = true;
+  } finally {
+    toastText.value = 'Xác thực thành công';
+    isError.value = false;
+    toastVisible.value = true;
+    setTimeout(() => {
+      isOpen.value = false;
+    }, 1500);
+  }
 }
 </script>
 
 <style scoped>
-
 .profile-container {
   margin: 0 156px;
   background-color: #ffffff;
@@ -155,20 +216,20 @@ const handleUnFollow = async (id) =>{
   flex-wrap: wrap;
 }
 
-.btn-secondary{
-    background-color: #e4e6eb;
-    border: none;
-    border-radius: 6px;
-    color: #050505;
+.btn-secondary {
+  background-color: #e4e6eb;
+  border: none;
+  border-radius: 6px;
+  color: #050505;
 }
 
-.icon-sm{
-    width: 16px;
-    height: 16px;
+.icon-sm {
+  width: 16px;
+  height: 16px;
 }
 
 .avatar-section {
-  margin-top: 36px; 
+  margin-top: 36px;
   margin-right: 26px;
 }
 
@@ -268,7 +329,7 @@ const handleUnFollow = async (id) =>{
   color: #0866ff;
   border-radius: 0;
   border-bottom: 3px solid #0866ff;
-  padding-bottom: 13px; 
+  padding-bottom: 13px;
 }
 
 .btn-more {
@@ -293,20 +354,20 @@ const handleUnFollow = async (id) =>{
     align-items: center;
     text-align: center;
   }
-  
+
   .avatar-section {
     margin-right: 0;
   }
-  
+
   .mutual-friends {
     justify-content: center;
   }
-  
+
   .action-buttons {
     align-items: center;
     margin-top: 16px;
   }
-  
+
   .nav-tabs {
     overflow-x: auto;
   }
