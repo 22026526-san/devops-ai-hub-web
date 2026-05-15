@@ -19,3 +19,7 @@ export const USER_ROLES = {
   USER: 'User',
   GUEST: 'Guest',
 };
+export const AI_ROLES = {
+  USER: 'user',
+  AI: 'assistant',
+};

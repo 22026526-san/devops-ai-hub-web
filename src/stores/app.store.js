@@ -7,6 +7,7 @@ export const useAppStore = defineStore('app', {
     settingMenu: false,
     idProfile : 1,
     isFetchProfile:false,
+    isUpdateProfile:false,
     selectedTopic:1,
     fillTitle:'',
     filters: {

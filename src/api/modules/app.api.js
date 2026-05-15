@@ -1,7 +1,7 @@
 import axiosInstance from '@/api/axios' 
 
-export const getTagsApi = () => {
-  return axiosInstance.get('/tags')
+export const getTagsApi = (params) => {
+  return axiosInstance.get('/tags',{params})
 }
 
 export const createTagApi = (data) => {

@@ -12,6 +12,7 @@ import ProfilePage from '@/views/app/ProfilePage.vue'
 import { useAppStore } from '@/stores/app.store'
 import LikePostPage from '@/views/app/LikePostPage.vue'
 import BookmarkPostPage from '@/views/app/BookmarkPostPage.vue'
+import ChatPage from '@/views/agent/ChatPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,10 +88,10 @@ const router = createRouter({
     {
       path: '/ai-agent',
       name: 'ai-agent',
-      component: HomePage,
+      component: ChatPage,
       meta: { 
         public: true ,
-        layout: DefaultLayout
+        layout: null
       },
     },
     {
